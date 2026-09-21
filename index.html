@@ -5238,7 +5238,16 @@ try{if(!DB.gated)openGate();}catch(e){reportErr(e);}
 /* ---- offline ------------------------------------------------------------
    Registered late and defensively: the app works identically without it, and a
    gym basement is exactly where a failed registration must not matter. */
+/* SWOK was written and never read, which is how nobody noticed that sw.js was
+   not in the build at all and every registration here had been failing
+   silently since the day it was written. It reports now. */
 var SWOK=false;
+function swUpdateReady(reg){
+ try{
+  var w=reg.waiting;if(!w)return;
+  toast('Update ready \u2014 reopen the app to use it.');
+  w.postMessage({type:'skip-waiting'});
+ }catch(e){}}
 (function(){
  try{
   if(!('serviceWorker' in navigator))return;
@@ -5246,8 +5255,17 @@ var SWOK=false;
   if(location.protocol!=='https:'&&location.hostname!=='localhost')return;
   window.addEventListener('load',function(){
    navigator.serviceWorker.register('sw.js',{scope:'./'})
-    .then(function(){SWOK=true;})
-    .catch(function(){});});
+    .then(function(reg){
+     SWOK=true;
+     swUpdateReady(reg);
+     reg.addEventListener('updatefound',function(){
+      var w=reg.installing;if(!w)return;
+      w.addEventListener('statechange',function(){
+       /* only when something was already serving: the very first install is
+          not an update and must not say so */
+       if(w.state==='installed'&&navigator.serviceWorker.controller)swUpdateReady(reg);});});
+    })
+    .catch(function(){SWOK=false;});});
  }catch(e){}})();
 /* Android fires this instead of showing its own prompt, so the offer lives in
    Settings where it can be explained rather than as a banner nobody trusts. */
