@@ -12,9 +12,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#E7E5DC" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121114" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="pwa/manifest.webmanifest">
-<link rel="apple-touch-icon" href="pwa/apple-touch-icon.png">
-<link rel="icon" href="pwa/favicon-32.png" sizes="32x32">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter+Tight:wght@400;500;600;700;800&family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Old+Mincho:wght@700;900&family=Zen+Maru+Gothic:wght@400;500;700;900&family=Outfit:wght@400;500;700;800&display=swap">
 <style>
@@ -255,6 +255,32 @@ h1.t span.ch{display:inline-block}
  background-image:radial-gradient(var(--ink) .65px,transparent .75px);background-size:3.6px 3.6px;opacity:.22}
 .plate.noimg .im{display:none}
 .plate.noimg:after{content:"Diagram unavailable";display:block;padding:14px;font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+/* ---- media loading state ------------------------------------------------
+   A 100 KB animated GIF decodes on a background thread and then SNAPS in. Six
+   of those snapping in at different moments as you scroll is most of what read
+   as the app stuttering, even though nothing was actually dropping frames. The
+   frame is drawn immediately at its final size (so nothing reflows), a quiet
+   sweep says the clip is coming, and the clip itself fades up over it. */
+.plate .im{background:var(--card)}
+/* two flat layers, no color-mix: this has to hold up in an old Android WebView,
+   where a dropped background-image costs the sweep and nothing else */
+.plate .im:before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+ background:var(--card);opacity:1;transition:opacity .34s ease .04s}
+.plate .im:after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+ color:var(--ink);opacity:.07;transition:opacity .34s ease;
+ background-image:linear-gradient(100deg,transparent 20%,currentColor 44%,transparent 68%);
+ background-size:260% 100%;background-repeat:no-repeat;animation:sheen 1.5s ease-in-out infinite}
+.plate.ready .im:before,.plate.ready .im:after{opacity:0;animation:none}
+@keyframes sheen{0%{background-position:150% 0}100%{background-position:-60% 0}}
+.plate img,.tgif{opacity:0;transition:opacity .42s cubic-bezier(.2,.9,.3,1),transform .42s cubic-bezier(.2,.9,.3,1)}
+.plate img{transform:scale(1.012)}
+.plate img.mok,.tgif.mok{opacity:1;transform:none}
+.plateout{margin:0 0 11px}
+/* let the browser skip paint work for rows nowhere near the viewport */
+.lift:not(.open) .thumb{content-visibility:auto;contain-intrinsic-size:46px 46px}
+@media (prefers-reduced-motion:reduce){
+ .plate .im:before,.plate .im:after{animation:none;opacity:0}
+ .plate img,.tgif{transition:none;opacity:1;transform:none}}
 
 .plnote{margin:-6px 0 10px;font-size:10px;line-height:1.4;letter-spacing:.04em;text-transform:uppercase;
  color:var(--mut);border-left:2px solid var(--a3);padding:3px 0 3px 7px}
@@ -390,6 +416,34 @@ h1.t span.ch{display:inline-block}
   #FFE9C2 50%,rgba(226,80,42,.6) 51%,rgba(226,80,42,.06) 58%,transparent 100%);
  mix-blend-mode:screen;will-change:transform,opacity}
 @media (prefers-reduced-motion:reduce){.bladeedge{display:none}}
+/* ---- SCREENPRINT: the press edge ----------------------------------------
+   Ember gets a blade because heat travels. A screenprint does not travel, it
+   is PULLED: a squeegee crosses the mesh once, the ink lands hard-edged, and
+   the sheet is either printed or it is not. So the edge here is opaque ink
+   with a dry shoulder behind it, and it moves in discrete steps rather than
+   gliding - the press advancing frame by frame. */
+.pressedge{position:absolute;top:0;bottom:0;left:0;width:100%;z-index:72;pointer-events:none;
+ background:linear-gradient(90deg,transparent 0%,transparent 44.6%,var(--a2) 44.8%,var(--a2) 46.4%,
+  var(--a3) 46.6%,var(--a3) 48.2%,var(--a1) 48.4%,var(--a1) 50%,var(--ink) 50%,var(--ink) 51.4%,
+  transparent 51.6%,transparent 100%);
+ will-change:transform,opacity}
+/* the registration marks tighten as the sheet lands */
+.screen[data-p="r"].inregister .regmark{animation:regsnap 340ms steps(3,end) both}
+@keyframes regsnap{0%{opacity:.1;transform:scale(1.5) rotate(-4deg)}
+ 60%{opacity:.6;transform:scale(1.12)}100%{opacity:.32;transform:none}}
+/* ---- WATERCOLOUR: the bleed ---------------------------------------------
+   Pigment does not cut and it does not slide. It spreads, softens at the
+   boundary, and the old mark is still faintly there while the new one wets in.
+   The blur is the whole point of the theme, so it is the whole mechanic. */
+.washedge{position:absolute;inset:0;z-index:71;pointer-events:none;mix-blend-mode:multiply;
+ background:radial-gradient(ellipse 58% 70% at var(--wx,50%) 46%,
+   color-mix(in srgb,var(--a1) 34%,transparent),transparent 72%),
+  radial-gradient(ellipse 44% 54% at var(--wx,50%) 64%,
+   color-mix(in srgb,var(--a2) 28%,transparent),transparent 70%);
+ filter:blur(14px);will-change:transform,opacity}
+@supports not (background:color-mix(in srgb,red 10%,transparent)){.washedge{opacity:.22}}
+@media (prefers-reduced-motion:reduce){.pressedge,.washedge{display:none}
+ .screen[data-p="r"].inregister .regmark{animation:none}}
 .wipe i:nth-child(1){top:-4%;background:var(--wipe1)}.wipe i:nth-child(2){top:32%;background:var(--wipe2)}.wipe i:nth-child(3){top:68%;background:var(--wipe3)}
 @keyframes sweep{0%{transform:skewY(-8deg) translateX(-130%)}45%{transform:skewY(-8deg) translateX(0)}100%{transform:skewY(-8deg) translateX(130%)}}
 @keyframes chIn{from{opacity:0;transform:translateY(11px) rotate(-6deg)}to{opacity:1;transform:none}}
@@ -2232,25 +2286,111 @@ function r05(n){return Math.round(n*2)/2;}
 function primaryOf(id){var h=(EXD[id]||{}).hits||{};var k=Object.keys(h).filter(function(x){return h[x]===1;});return k[0]||Object.keys(h)[0];}
 
 var MEDIA={"incline-db-press": "pectorals", "machine-chest-press": "pectorals", "cable-fly": "pectorals", "pushup": "pectorals", "landmine-press": "delts", "db-shoulder-press": "delts", "cable-lateral": "delts", "face-pull": "delts", "neutral-pulldown": "lats", "db-row": "upper back", "shrug": "traps", "back-extension": "spine", "ez-curl": "biceps", "hammer-curl": "biceps", "triceps-pushdown": "triceps", "cable-crunch": "abs", "pallof-press": "abs", "rdl": "glutes", "leg-curl": "hamstrings", "hack-squat": "glutes", "leg-press": "glutes", "goblet-squat": "quads", "standing-calf": "calves", "seated-calf": "calves", "adduction": "adductors", "rear-delt-fly": "delts", "chest-supported-row": "upper back", "skullcrusher": "triceps", "hip-thrust": "glutes", "db-lateral": "delts", "leg-raise": "abs", "side-plank": "abs", "cossack": "glutes"};
-function gifFor(id){return MEDIA[id]?('media/'+id+'.gif'):null;}
+/* ---- where the demonstrations actually live ------------------------------
+   This shipped hard-coded to 'media/<id>.gif'. The files sit next to
+   index.html, so every single one 404'd and every plate quietly fell through
+   to the schematic - which is why the app was full of stick figures with a
+   full set of clips sitting right there. Hard-coding the other layout would
+   only move the same bug, so the path is RESOLVED instead: each candidate base
+   is tried in turn, the one that actually loads is remembered for next launch,
+   and the schematic is reached only when no base has the file at all. */
+var MEDIA_BASES=['','media/','assets/','assets/media/','gif/'];
+var _mbase=0;
+try{var _mb=store.get('forge.mbase',0);
+ if(typeof _mb==='number'&&_mb>=0&&_mb<MEDIA_BASES.length)_mbase=_mb;}catch(e){}
+function mediaSrc(id,i){return MEDIA_BASES[i%MEDIA_BASES.length]+id+'.gif';}
+function gifFor(id){return MEDIA[id]?mediaSrc(id,_mbase):null;}
+function mediaAttrs(id){return ' data-mid="'+id+'" data-mbase="'+_mbase+'" data-mtry="0"';}
 /* where the nearest available demo is not exactly our movement, say so on the plate */
 var MEDIANOTE={'hip-thrust':'Nearest demo: floor glute bridge. Yours puts the shoulders on a bench \u2014 same hip extension, longer range.'};
+/* The schematic is the LAST resort, not the default. Kept as its own function so
+   the media path and the give-up path cannot drift apart. */
+function schematic(id,size){
+ var arch=ARCHMAP[id],a1=((THEME[themeKey()]||THEME.g).a1)||'#F0112E';
+ if(!arch||typeof panelSVG!=='function')
+  return size==='thumb'?'':'<div class="empty" style="padding:12px"><p>No diagram yet.</p></div>';
+ var A,B;
+ try{A=panelSVG(arch,'a',primaryOf(id),a1);B=panelSVG(arch,'b',primaryOf(id),a1);}catch(e){A=B=null;}
+ if(size==='thumb')return B||A||'';
+ if(!A&&!B)return '<div class="empty" style="padding:12px"><p>No diagram yet.</p></div>';
+ return '<div class="strip2"><div class="pnl"><em>START</em>'+(A||'')+'</div><div class="arrow">&rarr;</div>'+
+        '<div class="pnl"><em>FINISH</em>'+(B||'')+'</div></div>';}
 function panelPair(id,size){
  var g=gifFor(id),e=EXD[id]||{};
- if(g){
-  if(size==='thumb')return '<img class="tgif" src="'+g+'" alt="" loading="lazy">';
-  return '<figure class="plate"><span class="tag">Working &middot; '+(MEDIA[id]||'').replace(/_/g,' ')+'</span>'+
-   '<span class="im"><img src="'+g+'" alt="'+(e.name||'')+' demonstration" loading="lazy"'+
-   ' onerror="this.closest(\'.plate\').classList.add(\'noimg\')"></span>'+
-   '<span class="lp">&copy; Gym visual</span></figure>'+
-   (MEDIANOTE[id]?'<p class="plnote">'+MEDIANOTE[id]+'</p>':'');
- }
- var arch=ARCHMAP[id],a1=THEME[themeKey()].a1;
- if(!arch||typeof panelSVG!=='function'){return size==='thumb'?'':'<div class="empty" style="padding:12px"><p>No diagram yet.</p></div>';}
- var A=panelSVG(arch,'a',primaryOf(id),a1),B=panelSVG(arch,'b',primaryOf(id),a1);
- if(size==='thumb')return B||A||'';
- return '<div class="strip2"><div class="pnl"><em>START</em>'+A+'</div><div class="arrow">&rarr;</div>'+
-        '<div class="pnl"><em>FINISH</em>'+B+'</div></div>';}
+ if(!g)return schematic(id,size);
+ if(size==='thumb')
+  return '<img class="tgif"'+mediaAttrs(id)+' src="'+g+'" alt="" width="46" height="46"'+
+   ' loading="lazy" decoding="async">';
+ return '<figure class="plate"><span class="tag">Working &middot; '+(MEDIA[id]||'').replace(/_/g,' ')+'</span>'+
+  '<span class="im"><img'+mediaAttrs(id)+' src="'+g+'" alt="'+(e.name||'')+' demonstration"'+
+  ' width="360" height="196" loading="lazy" decoding="async"></span>'+
+  '<span class="lp">&copy; Gym visual</span></figure>'+
+  (MEDIANOTE[id]?'<p class="plnote">'+MEDIANOTE[id]+'</p>':'');}
+/* Capture phase: an <img> error does not bubble, so a delegated listener has to
+   catch it on the way down. One listener covers every plate and thumb the app
+   will ever render, including the ones that do not exist yet. */
+function mediaFallback(img){
+ var id=img.getAttribute('data-mid');if(!id)return;
+ try{
+  var fig=img.closest?img.closest('.plate'):null;
+  if(fig&&fig.parentNode){
+   var slot=document.createElement('div');slot.className='plateout';
+   slot.innerHTML=schematic(id,'full');
+   fig.parentNode.replaceChild(slot,fig);
+   var note=slot.nextElementSibling;
+   if(note&&note.className==='plnote')note.remove();
+   return;}
+  var th=img.parentNode;
+  if(th&&th.classList&&th.classList.contains('thumb')){th.innerHTML=schematic(id,'thumb');return;}
+  img.remove();
+ }catch(e){try{img.remove();}catch(e2){}}}
+function isMedia(n){return !!(n&&n.tagName==='IMG'&&n.getAttribute&&n.getAttribute('data-mid'));}
+function mediaOK(img){
+ try{
+  img.classList.add('mok');
+  var fig=img.closest?img.closest('.plate'):null;if(fig)fig.classList.add('ready');
+  var i=parseInt(img.getAttribute('data-mbase'),10)||0;
+  if(i!==_mbase){_mbase=i;try{store.set('forge.mbase',i);}catch(e){}}
+ }catch(e){}}
+function mediaRetry(img){
+ var id=img.getAttribute('data-mid'),
+     i=parseInt(img.getAttribute('data-mbase'),10)||0,
+     tried=(parseInt(img.getAttribute('data-mtry'),10)||0)+1;
+ if(tried<MEDIA_BASES.length){       /* wrap, so a stale remembered base still retries the rest */
+  var n=(i+1)%MEDIA_BASES.length;
+  img.setAttribute('data-mbase',String(n));img.setAttribute('data-mtry',String(tried));
+  img.src=mediaSrc(id,n);return;}
+ mediaFallback(img);}
+document.addEventListener('error',function(ev){if(isMedia(ev.target))mediaRetry(ev.target);},true);
+document.addEventListener('load', function(ev){if(isMedia(ev.target))mediaOK(ev.target);},true);
+/* The two listeners above cover everything that loads while we are watching.
+   They do NOT cover an image that came out of cache and finished before it was
+   inserted, and they do not cover a decode that simply never resolves - and a
+   placeholder left sweeping forever is worse than no placeholder at all. So
+   every media image that enters the screen is also checked once directly and
+   given a deadline. */
+var MEDIA_DEADLINE=9000;
+function watchMedia(img){
+ if(img.__mw)return;img.__mw=1;
+ if(img.complete){                    /* resolved before anyone was listening */
+  if(img.naturalWidth>0)return mediaOK(img);
+  return mediaRetry(img);}
+ setTimeout(function(){
+  try{
+   if(!img.parentNode||img.classList.contains('mok'))return;
+   if(img.complete&&img.naturalWidth>0)return mediaOK(img);
+   mediaFallback(img);            /* stalled: show the schematic rather than a sweep */
+  }catch(e){}
+ },MEDIA_DEADLINE);}
+try{
+ new MutationObserver(function(recs){
+  for(var i=0;i<recs.length;i++){var a=recs[i].addedNodes;
+   for(var j=0;j<a.length;j++){var n=a[j];
+    if(isMedia(n)){watchMedia(n);continue;}
+    if(n.querySelectorAll){var q=n.querySelectorAll('img[data-mid]');
+     for(var k=0;k<q.length;k++)watchMedia(q[k]);}}}
+ }).observe(document.documentElement,{childList:true,subtree:true});
+}catch(e){}
 /* The bar used to rebuild its whole DOM once a second, which destroyed the buttons
    mid-rest. Built once now; only the number and the drain move. */
 var restLeft=0,restTotal=0,restInt=null;
@@ -4430,7 +4570,27 @@ function applyTempo(){var t=tempo(),s=screenEl.style;
  s.setProperty('--fxD',   Math.round(BASE.burst*t)+'ms');
  s.setProperty('--inD',   Math.round(BASE.enter*t)+'ms');
  s.setProperty('--st',    Math.round(BASE.stagger*t)+'ms');}
-var sliding=false;
+var sliding=false,_slideGuard=null;
+/* A transition that throws part way through used to leave `sliding` latched on
+   for good, and a latched flag means every tab, every Back and every swipe is
+   silently ignored from then on - the app looks frozen while being perfectly
+   healthy. Nothing may hold the lock longer than the animation it belongs to. */
+function releaseSlide(){
+ clearTimeout(_slideGuard);_slideGuard=null;sliding=false;}
+function armSlide(ms){
+ sliding=true;clearTimeout(_slideGuard);
+ _slideGuard=setTimeout(function(){
+  if(!sliding)return;
+  try{                       /* something threw: tidy up whatever was left mid-air */
+   screenEl.querySelectorAll('.ghostlayer,.bladeedge,.pressedge,.washedge')
+    .forEach(function(n){try{n.remove();}catch(e){}});
+   screenEl.classList.remove('inregister');
+   clearSlide(movables());
+   scrollEl.style.clipPath='';scrollEl.style.transformOrigin='';
+   scrollEl.style.filter='';scrollEl.style.willChange='';
+  }catch(e){}
+  sliding=false;
+ },Math.max(400,(ms||0)+900));}
 function renderFor(t){return t==='train'?renderTrain:t==='plan'?renderPlan:t==='body'?renderBody:renderVersus;}
 function selectTab(t){document.querySelectorAll('.tab').forEach(function(x){
  x.setAttribute('aria-selected',String(x.dataset.tab===t));});}
@@ -4468,23 +4628,92 @@ function ghostOut(){
    screen is never blanked, and the new one is rendered BEFORE anything moves —
    but the mechanic itself changes, because a slide with a different duration is
    still a slide and that is what made four themes feel like one app repainted. */
-function transitionKind(){var k=themeKey();
- return k==='e'?'blade':(k==='b'||k==='v')?'bloom':'slide';}
+/* Six worlds, six mechanics. Every one still obeys the two guarantees above -
+   the old screen is never blanked, and the new one is rendered BEFORE anything
+   moves - but what actually happens between them is the theme's own idea:
+
+     r  press   a squeegee pull. Hard ink edge, stepped, nothing glides.
+     v  wash    pigment wets in and bleeds past the boundary.
+     g  paper   a sheet laid on a sheet. Almost nothing. That is the brief.
+     c  settle  no travel to speak of; it arrives by coming to rest.
+     e  blade   a strike of heat across the glass.
+     b  bloom   it opens, overshoots and relaxes.                          */
+var KIND={r:'press',v:'wash',g:'paper',c:'settle',e:'blade',b:'bloom'};
+/* Blur and large composited overlays are the two things that actually cost
+   frames on a weak phone, so the two mechanics that use them degrade to their
+   nearest cheap relative rather than dropping frames in character. */
+var LOWPOWER=(function(){try{
+ var c=navigator.hardwareConcurrency;
+ if(typeof c==='number'&&c>0&&c<=4)return true;
+ var m=navigator.deviceMemory;
+ if(typeof m==='number'&&m>0&&m<=2)return true;
+}catch(e){}return false;})();
+/* The edge graphic sits at the CENTRE of a full-width element, so the element
+   has to travel half its own width further than the distance the edge itself is
+   meant to cover. Without that the ink comes to rest in the middle of the glass
+   and the pass never finishes - which is what Ember's blade had been doing
+   since it was written, just slowly enough to read as "nearly right". One
+   helper now, so the two edges cannot disagree about it again. */
+function edgeTravel(dir){return dir>0?{a:'50%',b:'-56%'}:{a:'-50%',b:'56%'};}
+function transitionKind(){
+ var k=KIND[themeKey()]||'slide';
+ if(LOWPOWER&&(k==='wash'||k==='bloom'))return 'settle';
+ return k;}
 function slideTo(dir,fn){
  var S=slideSpec(),els=movables();
  if(sliding||RM||!els.length){try{fn();markEnter();}catch(e){} return;}
  if(scrollEl.hidden||els.length>1||!viewEl.firstChild)return slideLegacy(dir,fn,S);
- sliding=true;
+ armSlide(Math.round(S.dur*1.12));
  var ghost=null;
  try{ghost=ghostOut();}catch(e){ghost=null;}
- if(!ghost){sliding=false;return slideLegacy(dir,fn,S);}
+ if(!ghost){releaseSlide();return slideLegacy(dir,fn,S);}
  try{fn();}catch(e){}
  try{scrollEl.scrollTop=0;}catch(e){}
  scrollEl.style.willChange='transform,opacity,clip-path';
  scrollEl.style.transition='none';
 
- var kind=transitionKind(),blade=null;
- if(kind==='blade'){
+ var kind=transitionKind(),blade=null,edge=null;
+ if(kind==='press'){
+  /* SCREENPRINT — a squeegee pull, not a page turn. The sheet does not move at
+     all: the ink simply lands, hard-edged, behind a pull bar carrying the four
+     separations. Stepped timing, because a press advances in stops. */
+  /* the sheet underneath is already finished and fully opaque; it is the OLD
+     one that the pull takes away, edge-aligned, so no part of the glass is ever
+     empty and nothing has to be faded to make the reveal work */
+  scrollEl.style.transform='translate3d(0,0,0)';
+  scrollEl.style.opacity='1';
+  ghost.style.clipPath='inset(0 0 0 0)';
+  edge=document.createElement('i');
+  edge.className='pressedge';
+  edge.style.transform='translate3d('+edgeTravel(dir).a+',0,0)';
+  screenEl.appendChild(edge);
+ }else if(kind==='wash'){
+  /* WATERCOLOUR — pigment wets in. The new screen comes up soft and out of
+     focus and dries into the paper; a bloom of the two accents spreads from
+     the edge the move came from and evaporates. */
+  scrollEl.style.transformOrigin='50% 44%';
+  scrollEl.style.transform='scale(.988) translate3d('+(dir*5)+'px,0,0)';
+  scrollEl.style.opacity='0';
+  scrollEl.style.filter='blur(7px)';
+  edge=document.createElement('i');
+  edge.className='washedge';
+  edge.style.setProperty('--wx',(dir>0?78:22)+'%');
+  edge.style.opacity='0';
+  screenEl.appendChild(edge);
+ }else if(kind==='paper'){
+  /* PAPER — "barely reacts" is the brief, and a theme that keeps its word is
+     worth more than one more effect. One sheet laid over another: a couple of
+     pixels of travel and a clean crossfade. Nothing else happens. */
+  scrollEl.style.transform='translate3d('+(dir*3)+'px,0,0)';
+  scrollEl.style.opacity='0';
+ }else if(kind==='settle'){
+  /* SLATE — arrives by coming to rest. No travel worth the name, no overshoot,
+     no colour thrown at it; just a long decelerating fade that stops moving
+     before you notice it started. */
+  scrollEl.style.transformOrigin='50% 50%';
+  scrollEl.style.transform='translate3d(0,7px,0)';
+  scrollEl.style.opacity='0';
+ }else if(kind==='blade'){
   /* EMBER — a cut. The new screen is revealed behind a bright leading edge that
      travels across the glass; the old one only drifts a little and goes dark.
      Nothing slides in from off-screen, so it reads as a strike rather than a
@@ -4494,7 +4723,7 @@ function slideTo(dir,fn){
   scrollEl.style.clipPath=dir>0?'inset(0 0 0 100%)':'inset(0 100% 0 0)';
   blade=document.createElement('i');
   blade.className='bladeedge';
-  blade.style.transform='translate3d('+(dir>0?'100%':'-100%')+',0,0)';
+  blade.style.transform='translate3d('+edgeTravel(dir).a+',0,0)';
   screenEl.appendChild(blade);
  }else if(kind==='bloom'){
   /* BLOSSOM / WATERCOLOUR — the new screen opens rather than arrives: it comes
@@ -4509,14 +4738,52 @@ function slideTo(dir,fn){
 
  requestAnimationFrame(function(){requestAnimationFrame(function(){
   var d=S.dur;
-  if(kind==='blade'){
+  if(kind==='press'){
+   ghost.style.transition='clip-path '+d+'ms steps(6,end)';
+   ghost.style.clipPath=dir>0?'inset(0 100% 0 0)':'inset(0 0 0 100%)';
+   edge.style.transition='transform '+d+'ms steps(6,end),opacity '+Math.round(d*0.9)+'ms linear '+Math.round(d*0.62)+'ms';
+   edge.style.transform='translate3d('+edgeTravel(dir).b+',0,0)';
+   edge.style.opacity='0';
+   try{screenEl.classList.remove('inregister');void screenEl.offsetWidth;
+       screenEl.classList.add('inregister');}catch(e){}
+  }else if(kind==='wash'){
+   ghost.style.transition='opacity '+Math.round(d*0.7)+'ms linear,filter '+d+'ms '+S.ease+
+    ',transform '+d+'ms '+S.ease;
+   ghost.style.filter='blur(9px)';
+   ghost.style.transform='scale(1.02) translate3d('+(-dir*7)+'px,0,0)';
+   ghost.style.opacity='0';
+   scrollEl.style.transition='transform '+d+'ms '+S.ease+',opacity '+Math.round(d*0.6)+
+    'ms linear,filter '+Math.round(d*0.82)+'ms '+S.ease;
+   scrollEl.style.transform='scale(1) translate3d(0,0,0)';
+   scrollEl.style.opacity='1';
+   scrollEl.style.filter='blur(0px)';
+   edge.style.transition='opacity '+Math.round(d*0.44)+'ms ease-out';
+   edge.style.opacity='1';
+   setTimeout(function(){try{edge.style.transition='opacity '+Math.round(d*0.6)+'ms ease-in';
+    edge.style.opacity='0';}catch(e){}},Math.round(d*0.34));
+  }else if(kind==='paper'){
+   ghost.style.transition='transform '+d+'ms '+S.ease+',opacity '+Math.round(d*0.8)+'ms linear';
+   ghost.style.transform='translate3d('+(-dir*3)+'px,0,0)';
+   ghost.style.opacity='0';
+   scrollEl.style.transition='transform '+d+'ms '+S.ease+',opacity '+Math.round(d*0.86)+'ms linear';
+   scrollEl.style.transform='translate3d(0,0,0)';
+   scrollEl.style.opacity='1';
+  }else if(kind==='settle'){
+   ghost.style.transition='transform '+d+'ms '+S.ease+',opacity '+Math.round(d*0.5)+'ms linear';
+   ghost.style.transform='translate3d(0,-5px,0)';
+   ghost.style.opacity='0';
+   scrollEl.style.transition='transform '+Math.round(d*1.12)+'ms '+S.ease+
+    ',opacity '+Math.round(d*0.62)+'ms linear';
+   scrollEl.style.transform='translate3d(0,0,0)';
+   scrollEl.style.opacity='1';
+  }else if(kind==='blade'){
    ghost.style.transition='transform '+d+'ms '+S.ease+',opacity '+Math.round(d*0.8)+'ms linear';
    ghost.style.transform='translate3d('+(-dir*5)+'%,0,0)';
    ghost.style.opacity='0';
    scrollEl.style.transition='clip-path '+d+'ms '+S.ease;
    scrollEl.style.clipPath='inset(0 0 0 0)';
    blade.style.transition='transform '+d+'ms '+S.ease+',opacity '+d+'ms ease-in';
-   blade.style.transform='translate3d('+(dir>0?'-4%':'4%')+',0,0)';
+   blade.style.transform='translate3d('+edgeTravel(dir).b+',0,0)';
    blade.style.opacity='0';
   }else if(kind==='bloom'){
    ghost.style.transition='transform '+d+'ms '+S.ease+',opacity '+Math.round(d*0.66)+'ms linear';
@@ -4534,18 +4801,22 @@ function slideTo(dir,fn){
    scrollEl.style.transform='translate3d(0,0,0)';
    scrollEl.style.opacity='1';
   }
+  var dEnd=(kind==='settle'?Math.round(d*1.12):d)+40;
   setTimeout(function(){
    try{ghost.remove();}catch(e){}
    try{if(blade)blade.remove();}catch(e){}
+   try{if(edge)edge.remove();}catch(e){}
+   try{screenEl.classList.remove('inregister');}catch(e){}
    clearSlide([scrollEl]);
-   scrollEl.style.clipPath='';scrollEl.style.transformOrigin='';scrollEl.style.willChange='';
-   sliding=false;},d+40);
+   scrollEl.style.clipPath='';scrollEl.style.transformOrigin='';
+   scrollEl.style.filter='';scrollEl.style.willChange='';
+   releaseSlide();},dEnd);
  });});}
 function slideLegacy(dir,fn,S){
  S=S||slideSpec();
  var els=movables();
  if(sliding||RM||!els.length){try{fn();markEnter();}catch(e){} return;}
- sliding=true;
+ armSlide(S.out+S.ind);
  els.forEach(function(e){e.style.transition='transform '+S.out+'ms '+S.oe+',opacity '+S.out+'ms '+S.oe;
   e.style.transform='translate3d('+(-dir*S.dist)+'%,0,0)';e.style.opacity='0';});
  setTimeout(function(){
@@ -4557,7 +4828,7 @@ function slideLegacy(dir,fn,S){
   requestAnimationFrame(function(){
    els2.forEach(function(e){e.style.transition='transform '+S.ind+'ms '+S.ie+',opacity '+S.ind+'ms '+S.ie;
     e.style.transform='translate3d(0,0,0)';e.style.opacity='1';});
-   setTimeout(function(){clearSlide(els2);sliding=false;},S.ind+50);
+   setTimeout(function(){clearSlide(els2);releaseSlide();},S.ind+50);
   });
  },S.out);}
 /* ---- navigation history -------------------------------------------------
