@@ -1,0 +1,16 @@
+{
+  "name": "Halftone",
+  "short_name": "Halftone",
+  "description": "Evidence-based training, conditioning and energy tracking for two.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#E7E5DC",
+  "theme_color": "#E7E5DC",
+  "icons": [
+    {"src": "pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "pwa/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
