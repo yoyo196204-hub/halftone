@@ -16,7 +16,12 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="favicon-32.png" sizes="32x32">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter+Tight:wght@400;500;600;700;800&family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Old+Mincho:wght@700;900&family=Zen+Maru+Gothic:wght@400;500;700;900&family=Outfit:wght@400;500;700;800&display=swap">
+<!-- Bangers is comic lettering and Yuji Syuku is a brush hand; they are what
+     make the two worlds sound like themselves rather than look like themselves.
+     Both are Latin-subset here, so the CJK faces cost nothing extra. Every
+     theme names a real fallback: display type that fails to arrive must not
+     take the layout with it. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Inter+Tight:wght@400;500;600;700;800&family=Shippori+Mincho+B1:wght@700;800&family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Old+Mincho:wght@700;900&family=Zen+Maru+Gothic:wght@400;500;700;900&family=Outfit:wght@400;500;700;800&display=swap">
 <style>
 :root{--pg:#DDD9CE;--pi:#151210;--pm:#6E685F;--pr:#C6C1B4}
 :root{--disp:'Anton',Impact,sans-serif;--body:'Inter Tight',system-ui,sans-serif}
@@ -657,8 +662,16 @@ canvas.tgif{image-rendering:auto}
  box-shadow:4px 4px 0 var(--ink);margin-bottom:12px}
 .seshgo:active{box-shadow:1px 1px 0 var(--ink)}
 .seshgo b{display:block;font-family:var(--disp);font-size:21px;text-transform:uppercase;line-height:1}
+/* colour:inherit is load-bearing. `.sesh i` sets --mut and matches this element
+   too, at equal specificity and later in the sheet, so the subtitle on the big
+   coloured call to action was rendering mid-grey on saturated red - around
+   1.6:1, which is not a legibility opinion, it is unreadable. Taking the
+   button's own foreground puts it near 4.3:1 on Miles's red: short of AA for
+   text this size, but it is the lightest ink the theme has, and the honest
+   ceiling without repainting the button. It also stops short of the arrow now
+   instead of running under it. */
 .seshgo i{display:block;font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
- opacity:.85;margin-top:3px}
+ color:inherit;opacity:1;margin-top:3px;max-width:58%}
 .seshgo .arw{margin-left:auto;font-size:15px;flex-shrink:0}
 .sesh.finished .seshgo{display:none}
 
@@ -682,29 +695,42 @@ canvas.tgif{image-rendering:auto}
 /* Blossom in old mincho with a rounded gothic underneath it */
 .screen[data-p="b"]{--disp:'Zen Old Mincho','Shippori Mincho B1',Georgia,serif;
  --body:'Zen Maru Gothic','Inter Tight',system-ui,sans-serif}
-/* A mincho display face carries far less weight per pixel than Anton, so the
-   headline sizes and tracking are corrected rather than left to look thin. */
-.screen[data-p="e"] h1.t,.screen[data-p="b"] h1.t{font-size:31px;letter-spacing:0;line-height:.98}
-.screen[data-p="e"] .sesh b,.screen[data-p="b"] .sesh b{font-size:27px;letter-spacing:0}
-.screen[data-p="e"] .sxname,.screen[data-p="b"] .sxname{font-size:27px;letter-spacing:0;line-height:1.06}
-.screen[data-p="e"] .tab,.screen[data-p="b"] .tab,
-.screen[data-p="e"] .back,.screen[data-p="b"] .back{font-weight:700;letter-spacing:.06em}
-.screen[data-p="e"] .lifthead .nm b,.screen[data-p="b"] .lifthead .nm b{font-size:16px;letter-spacing:0}
 .screen[data-p="c"] h1.t{letter-spacing:-.02em;font-weight:800}
-/* A mincho face runs much wider per character than Anton, so every place that
-   was sized for a condensed display face overflows. These are the corrections,
-   measured against the longest real strings in the app rather than guessed. */
-.screen[data-p="e"] .seshnext .nn b,.screen[data-p="b"] .seshnext .nn b{
- font-size:15px;letter-spacing:0;line-height:1.12}
-.screen[data-p="e"] .seshgo b,.screen[data-p="b"] .seshgo b{font-size:19px;letter-spacing:0}
+/* A mincho face runs much wider per character than Anton and carries far less
+   weight per pixel, so every place sized for a condensed display face either
+   overflows or looks thin. These are the corrections, measured against the
+   longest real strings in the app rather than guessed - and, like the comic
+   pair's, held back until the face they were measured against has actually
+   loaded. Applying them to a Georgia fallback only moves the overflow. */
+html.f-mincho .screen[data-p="e"] h1.t,
+html.f-oldmincho .screen[data-p="b"] h1.t{font-size:31px;letter-spacing:0;line-height:.98}
+html.f-mincho .screen[data-p="e"] .sesh b,
+html.f-oldmincho .screen[data-p="b"] .sesh b{font-size:27px;letter-spacing:0}
+html.f-mincho .screen[data-p="e"] .sxname,
+html.f-oldmincho .screen[data-p="b"] .sxname{font-size:27px;letter-spacing:0;line-height:1.06}
+html.f-mincho .screen[data-p="e"] .lifthead .nm b,
+html.f-oldmincho .screen[data-p="b"] .lifthead .nm b{font-size:16px;letter-spacing:0}
+html.f-mincho .screen[data-p="e"] .seshnext .nn b,
+html.f-oldmincho .screen[data-p="b"] .seshnext .nn b{font-size:15px;letter-spacing:0;line-height:1.12}
+html.f-mincho .screen[data-p="e"] .seshgo b,
+html.f-oldmincho .screen[data-p="b"] .seshgo b{font-size:19px;letter-spacing:0}
+html.f-mincho .screen[data-p="e"] .sxlog b,
+html.f-oldmincho .screen[data-p="b"] .sxlog b{font-size:22px;letter-spacing:0}
+html.f-mincho .screen[data-p="e"] .splitcard > b,
+html.f-oldmincho .screen[data-p="b"] .splitcard > b{font-size:17px;letter-spacing:0;line-height:1.1}
+html.f-mincho .screen[data-p="e"] .hrow .hd b,
+html.f-oldmincho .screen[data-p="b"] .hrow .hd b{font-size:15px;letter-spacing:0}
+html.f-mincho .screen[data-p="e"] .cond b,
+html.f-oldmincho .screen[data-p="b"] .cond b{font-size:18px;letter-spacing:0}
+html.f-mincho .screen[data-p="e"] .gatek,
+html.f-oldmincho .screen[data-p="b"] .gatek{font-size:29px;letter-spacing:0;line-height:1.06}
+/* Safe whatever loaded: none of these set a size measured against a face. */
 .screen[data-p="e"] .seshgo i,.screen[data-p="b"] .seshgo i{font-size:8.5px;line-height:1.3;max-width:52%}
-.screen[data-p="e"] .sxlog b,.screen[data-p="b"] .sxlog b{font-size:22px;letter-spacing:0}
+.screen[data-p="r"] .seshgo i,.screen[data-p="v"] .seshgo i{font-size:9px;line-height:1.3;max-width:50%}
 .screen[data-p="e"] .lnk,.screen[data-p="b"] .lnk{font-size:10px;letter-spacing:.02em}
 .screen[data-p="e"] .empty b,.screen[data-p="b"] .empty b{letter-spacing:0}
-.screen[data-p="e"] .splitcard b,.screen[data-p="b"] .splitcard b{font-size:17px;letter-spacing:0;line-height:1.1}
-.screen[data-p="e"] .hrow .hd b,.screen[data-p="b"] .hrow .hd b{font-size:15px;letter-spacing:0}
-.screen[data-p="e"] .cond b,.screen[data-p="b"] .cond b{font-size:18px;letter-spacing:0}
-.screen[data-p="e"] .gatek,.screen[data-p="b"] .gatek{font-size:29px;letter-spacing:0;line-height:1.06}
+.screen[data-p="e"] .tab,.screen[data-p="b"] .tab,
+.screen[data-p="e"] .back,.screen[data-p="b"] .back{font-weight:700;letter-spacing:.06em}
 /* On the dark ground the demo frames read as lit panels rather than white holes:
    they get their own paper and the blend goes back to multiply. */
 .screen[data-p="e"]{--gifb:multiply}
@@ -716,7 +742,231 @@ canvas.tgif{image-rendering:auto}
  rgba(226,80,42,.21),transparent 72%) #EDE4DC}
 .screen[data-p="e"] .plate .im:before{background:#EDE4DC}
 .screen[data-p="e"] .plate .lp{background:#EDE4DC;color:#6B5B52}
+
+/* ---- 2. TAISHO WORLD: shared grammar for e and b ------------------------
+   The other pair. Same period, same voice, same ground; the season and the
+   hour are what differ. Where the comic pair is printed, this one is BRUSHED:
+   rules are strokes that taper, panels sit on woven paper, and the accent is
+   an element rather than an ink - heat for Ember, water and wisteria for
+   Blossom. */
+.screen[data-p="e"],.screen[data-p="b"]{--washi:.055}
+
+/* Washi: a woven ground, not a flat fill. Two crossed hatches at a very low
+   opacity, which is what stops a mincho page reading as a website. */
+.screen[data-p="e"] .lift,.screen[data-p="e"] .splitcard,.screen[data-p="e"] .sesh,
+.screen[data-p="e"] .cond,.screen[data-p="e"] .teambox,.screen[data-p="e"] .cssheet,
+.screen[data-p="b"] .lift,.screen[data-p="b"] .splitcard,.screen[data-p="b"] .sesh,
+.screen[data-p="b"] .cond,.screen[data-p="b"] .teambox,.screen[data-p="b"] .cssheet{
+ background-image:repeating-linear-gradient(90deg,
+   rgba(128,110,96,var(--washi)) 0 1px,transparent 1px 4px),
+  repeating-linear-gradient(0deg,
+   rgba(128,110,96,calc(var(--washi) * .72)) 0 1px,transparent 1px 5px)}
+
+/* A section head is a BRUSHED RULE: the stroke enters heavy and lifts off. */
+.screen[data-p="e"] .sect,.screen[data-p="b"] .sect{
+ font-family:var(--disp);font-size:11px;letter-spacing:.24em;font-weight:700;
+ color:var(--ink);opacity:.86;margin:20px 0 10px;text-transform:uppercase}
+.screen[data-p="e"] .sect::after,.screen[data-p="b"] .sect::after{
+ height:2.5px;opacity:1;border-radius:0 2px 2px 0;
+ -webkit-mask-image:linear-gradient(90deg,#000 0,#000 34%,rgba(0,0,0,.55) 68%,transparent 100%);
+ mask-image:linear-gradient(90deg,#000 0,#000 34%,rgba(0,0,0,.55) 68%,transparent 100%)}
+.screen[data-p="e"] .sect::after{background:linear-gradient(90deg,var(--a1),var(--a2))}
+.screen[data-p="b"] .sect::after{background:linear-gradient(90deg,var(--a1),var(--a2))}
+/* a brushed head also gets a mark before it, the way a seal sits before a line */
+.screen[data-p="e"] .sect::before,.screen[data-p="b"] .sect::before{
+ content:"";width:7px;height:7px;flex:0 0 auto;transform:rotate(45deg);
+ background:var(--a1);opacity:.9}
+
+/* Panels are mounted, not printed: a hairline keyline inside the border, the
+   way a print is mounted on board. No hard offset shadow anywhere in here. */
+.screen[data-p="e"] .lift,.screen[data-p="e"] .splitcard,.screen[data-p="e"] .cond,
+.screen[data-p="b"] .lift,.screen[data-p="b"] .splitcard,.screen[data-p="b"] .cond{
+ border-width:1px;position:relative}
+.screen[data-p="e"] .lift:before,.screen[data-p="e"] .splitcard:before,
+.screen[data-p="b"] .lift:before,.screen[data-p="b"] .splitcard:before{
+ content:"";position:absolute;inset:3px;pointer-events:none;z-index:0;
+ border:1px solid currentColor;opacity:.13}
+
+/* Buttons: a brushed keyline and an ink press, no offset block. */
+.screen[data-p="e"] .lnk,.screen[data-p="b"] .lnk,
+.screen[data-p="e"] .sb,.screen[data-p="b"] .sb,
+.screen[data-p="e"] .rb,.screen[data-p="b"] .rb{
+ border-width:1px;box-shadow:inset 0 0 0 3px rgba(128,110,96,.09)}
+.screen[data-p="e"] .lnk:active,.screen[data-p="b"] .lnk:active,
+.screen[data-p="e"] .sb:active,.screen[data-p="b"] .sb:active{
+ box-shadow:inset 0 0 0 40px rgba(128,110,96,.13)}
+.screen[data-p="e"] .seshgo,.screen[data-p="b"] .seshgo,
+.screen[data-p="e"] .sxlog,.screen[data-p="b"] .sxlog{border-width:1px;box-shadow:none}
+
+/* ---- EMBER: flame ------------------------------------------------------
+   The flame hem on a haori is a row of TONGUES along the bottom edge - uneven,
+   pointed, lapping upward. Stacked radial gradients gave a row of identical
+   bubbles, which is a different thing entirely. The edge is cut with a mask
+   instead, so the shape is drawn rather than approximated, and it lands where
+   the eye already stops: the base of the thing you are about to press. */
+.screen[data-p="e"] .seshgo,.screen[data-p="e"] .sxlog{position:relative;overflow:hidden}
+.screen[data-p="e"] .seshgo:after,.screen[data-p="e"] .sxlog:after{
+ content:"";position:absolute;left:0;right:0;bottom:0;height:15px;pointer-events:none;
+ background:linear-gradient(0deg,#FFD9A0 0%,var(--a2) 34%,var(--a1) 78%,rgba(226,80,42,0) 100%);
+ opacity:.92;
+ -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 15' preserveAspectRatio='none'%3E%3Cpath d='M0 15V10c3 0 4-4 6-8 1 4 3 6 5 3 1 5 4 6 6-5 2 10 5 9 7 4 2 4 4 3 5-2 2 5 4 8 15 8v5z' fill='%23000'/%3E%3C/svg%3E");
+ mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 15' preserveAspectRatio='none'%3E%3Cpath d='M0 15V10c3 0 4-4 6-8 1 4 3 6 5 3 1 5 4 6 6-5 2 10 5 9 7 4 2 4 4 3 5-2 2 5 4 8 15 8v5z' fill='%23000'/%3E%3C/svg%3E");
+ -webkit-mask-size:44px 15px;mask-size:44px 15px;
+ -webkit-mask-repeat:repeat-x;mask-repeat:repeat-x}
+/* the hem breathes. Slow and small - a fire in the room, not a fire alarm. */
+@media (prefers-reduced-motion:no-preference){
+ .screen[data-p="e"] .seshgo:after,.screen[data-p="e"] .sxlog:after{
+  animation:hem 3.4s ease-in-out infinite}}
+@keyframes hem{0%,100%{-webkit-mask-position:0 0;mask-position:0 0;opacity:.92}
+ 50%{-webkit-mask-position:22px 0;mask-position:22px 0;opacity:1}}
+.screen[data-p="e"] .tab[aria-selected="true"]{box-shadow:0 0 14px -2px rgba(226,80,42,.7)}
+
+/* ---- BLOSSOM: wisteria ------------------------------------------------
+   Wisteria HANGS. Every accent in this theme falls from the top edge of the
+   thing it belongs to rather than sitting under it, and a raceme tapers as it
+   goes down - which is the part that makes it read as a flower rather than as
+   a row of dots. */
+/* position only - NOT overflow:hidden. The finished-session stamp is an
+   absolutely positioned child that lands from scale(1.9), well outside the
+   card, and clipping the card would have quietly amputated the one moment in
+   the app that celebrates anything. The raceme is kept inside the box by
+   construction instead, and it sways by moving its MASK rather than rotating
+   its box, so its geometry never leaves the card in the first place. */
+.screen[data-p="b"] .sesh,.screen[data-p="b"] .cond{position:relative}
+.screen[data-p="b"] .sesh:before,.screen[data-p="b"] .cond:before{
+ content:"";position:absolute;left:0;right:0;top:0;height:30px;pointer-events:none;z-index:1;
+ background:linear-gradient(180deg,rgba(201,167,255,.85) 0%,rgba(212,82,126,.45) 58%,rgba(212,82,126,0) 100%);
+ -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 30'%3E%3Cg fill='%23000'%3E%3Cellipse cx='14' cy='2' rx='5' ry='3.4'/%3E%3Cellipse cx='14' cy='8' rx='4.2' ry='3'/%3E%3Cellipse cx='14' cy='14' rx='3.2' ry='2.4'/%3E%3Cellipse cx='14' cy='19' rx='2.1' ry='1.7'/%3E%3Cellipse cx='40' cy='2' rx='4.4' ry='3'/%3E%3Cellipse cx='40' cy='7' rx='3.4' ry='2.5'/%3E%3Cellipse cx='40' cy='12' rx='2.2' ry='1.8'/%3E%3Cellipse cx='63' cy='2' rx='5.2' ry='3.5'/%3E%3Cellipse cx='63' cy='8.5' rx='4.3' ry='3'/%3E%3Cellipse cx='63' cy='15' rx='3.2' ry='2.4'/%3E%3Cellipse cx='63' cy='20.5' rx='2.2' ry='1.7'/%3E%3Cellipse cx='63' cy='25' rx='1.3' ry='1.1'/%3E%3Cellipse cx='84' cy='2' rx='4' ry='2.8'/%3E%3Cellipse cx='84' cy='7' rx='3' ry='2.2'/%3E%3Cellipse cx='84' cy='11.5' rx='1.9' ry='1.5'/%3E%3C/g%3E%3C/svg%3E");
+ mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 30'%3E%3Cg fill='%23000'%3E%3Cellipse cx='14' cy='2' rx='5' ry='3.4'/%3E%3Cellipse cx='14' cy='8' rx='4.2' ry='3'/%3E%3Cellipse cx='14' cy='14' rx='3.2' ry='2.4'/%3E%3Cellipse cx='14' cy='19' rx='2.1' ry='1.7'/%3E%3Cellipse cx='40' cy='2' rx='4.4' ry='3'/%3E%3Cellipse cx='40' cy='7' rx='3.4' ry='2.5'/%3E%3Cellipse cx='40' cy='12' rx='2.2' ry='1.8'/%3E%3Cellipse cx='63' cy='2' rx='5.2' ry='3.5'/%3E%3Cellipse cx='63' cy='8.5' rx='4.3' ry='3'/%3E%3Cellipse cx='63' cy='15' rx='3.2' ry='2.4'/%3E%3Cellipse cx='63' cy='20.5' rx='2.2' ry='1.7'/%3E%3Cellipse cx='63' cy='25' rx='1.3' ry='1.1'/%3E%3Cellipse cx='84' cy='2' rx='4' ry='2.8'/%3E%3Cellipse cx='84' cy='7' rx='3' ry='2.2'/%3E%3Cellipse cx='84' cy='11.5' rx='1.9' ry='1.5'/%3E%3C/g%3E%3C/svg%3E");
+ -webkit-mask-size:96px 30px;mask-size:96px 30px;
+ -webkit-mask-repeat:repeat-x;mask-repeat:repeat-x}
+/* it sways, because wisteria does, and because a still flower on a screen
+   looks like a graphic rather than a thing hanging in air */
+@media (prefers-reduced-motion:no-preference){
+ .screen[data-p="b"] .sesh:before,.screen[data-p="b"] .cond:before{
+  animation:sway 9s ease-in-out infinite}}
+@keyframes sway{0%,100%{-webkit-mask-position:0 0;mask-position:0 0}
+ 50%{-webkit-mask-position:7px 0;mask-position:7px 0}}
+.screen[data-p="b"] .tab[aria-selected="true"]{box-shadow:0 2px 10px -3px rgba(212,82,126,.6)}
+/* A hard offset block belongs to the printed pair, not to a mounted one. */
+.screen[data-p="e"] .kit.act,.screen[data-p="b"] .kit.act,
+.screen[data-p="e"] .cond,.screen[data-p="b"] .cond{box-shadow:0 1px 0 rgba(128,110,96,.18)}
+@media (prefers-reduced-motion:reduce){
+ .screen[data-p="e"] .seshgo:after,.screen[data-p="e"] .sxlog:after,
+ .screen[data-p="b"] .sesh:before,.screen[data-p="b"] .cond:before{animation:none}}
+
 .screen[data-p="v"] h1.t{letter-spacing:-.01em;font-weight:900}
+
+/* ==========================================================================
+   TWO WORLDS, DRAWN NOT DECORATED
+   --------------------------------------------------------------------------
+   The palettes were doing all the work and the grammar underneath was the same
+   app every time. Each pair now shares a STRUCTURE and disagrees about medium,
+   which is the actual idea in both sources:
+
+     r + v   one comic page. Same lettering, same caption boxes, same panel
+             gutters and rules. Miles is printed - hard edges, ink out of
+             register, paper showing through. Gwen is painted - the same marks
+             laid down wet, bleeding past the line they were drawn on.
+
+     e + b   one Taisho-era world. Same mincho voice, same washi ground, same
+             brushed rules. Ember is the forge at night. Blossom is that world
+             in daylight with the season turned over.
+
+   Nothing here is an overlay effect for its own sake: every rule below changes
+   a thing you read or press.
+   ========================================================================== */
+
+/* ---- 1. COMIC PAGE: shared grammar for r and v --------------------------- */
+.screen[data-p="r"],.screen[data-p="v"]{
+ --disp:'Bangers','Anton',Impact,sans-serif;
+ --gut:3px}                    /* the gutter between panels on a comic page */
+/* Bangers carries far more width and far less height per character than Anton,
+   so every display size below is re-measured rather than inherited. They are
+   measured AGAINST BANGERS, which makes them wrong for whatever the fallback
+   turns out to be - and on a first run with no network, or behind a CDN the
+   phone cannot reach, the fallback is what you get. So they wait for the real
+   face to report in: f-bangers is set from the font loading API, never assumed.
+   The mincho pair below works the same way. */
+html.f-bangers .screen[data-p="r"] h1.t,
+html.f-bangers .screen[data-p="v"] h1.t{font-size:38px;letter-spacing:.012em;line-height:.86;text-transform:none}
+html.f-bangers .screen[data-p="r"] .sesh b,
+html.f-bangers .screen[data-p="v"] .sesh b{font-size:30px;letter-spacing:.01em;line-height:1}
+html.f-bangers .screen[data-p="r"] .sxname,
+html.f-bangers .screen[data-p="v"] .sxname{font-size:30px;letter-spacing:.01em;line-height:1;text-transform:none}
+html.f-bangers .screen[data-p="r"] .seshgo b,
+html.f-bangers .screen[data-p="v"] .seshgo b{font-size:26px;letter-spacing:.015em}
+html.f-bangers .screen[data-p="r"] .sxlog b,
+html.f-bangers .screen[data-p="v"] .sxlog b{font-size:30px;letter-spacing:.02em}
+html.f-bangers .screen[data-p="r"] .lifthead .nm b,
+html.f-bangers .screen[data-p="v"] .lifthead .nm b{font-size:18px;letter-spacing:.01em}
+/* `> b`, not ` b`. The split card's title is a direct child; the day-of-week
+   codes inside it are <b> too, and `.wd b` only beats the card's own `.splitcard
+   b` on source order. A correction at this specificity wins against BOTH, so a
+   descendant selector here silently blew every day cell up to the title size and
+   pushed "rest" out through the side of its box. Any correction that outranks
+   the base sheet has to be as narrow as the thing it is correcting. */
+html.f-bangers .screen[data-p="r"] .splitcard > b,
+html.f-bangers .screen[data-p="v"] .splitcard > b{font-size:20px;letter-spacing:.01em}
+html.f-bangers .screen[data-p="r"] .cond b,
+html.f-bangers .screen[data-p="v"] .cond b{font-size:22px;letter-spacing:.01em}
+html.f-bangers .screen[data-p="r"] .gatek,
+html.f-bangers .screen[data-p="v"] .gatek{font-size:34px;letter-spacing:.01em;line-height:1}
+html.f-bangers .screen[data-p="r"] .seshnext .nn b,
+html.f-bangers .screen[data-p="v"] .seshnext .nn b{font-size:17px;letter-spacing:.01em;line-height:1.08}
+html.f-bangers .screen[data-p="r"] .hrow .hd b,
+html.f-bangers .screen[data-p="v"] .hrow .hd b{font-size:17px;letter-spacing:.01em}
+html.f-bangers .screen[data-p="r"] .cssheet b,
+html.f-bangers .screen[data-p="v"] .cssheet b{font-size:26px;letter-spacing:.01em}
+html.f-bangers .screen[data-p="r"] .wval,html.f-bangers .screen[data-p="v"] .wval,
+html.f-bangers .screen[data-p="r"] .condnum,html.f-bangers .screen[data-p="v"] .condnum,
+html.f-bangers .screen[data-p="r"] .empty b,html.f-bangers .screen[data-p="v"] .empty b{letter-spacing:.02em}
+
+/* A section head is a CAPTION BOX. On a comic page the narration sits in a
+   taped-down box in the corner, not on a hairline rule. */
+.screen[data-p="r"] .sect,.screen[data-p="v"] .sect{
+ display:inline-flex;font-size:9px;letter-spacing:.14em;font-weight:800;color:var(--onacc);
+ background:var(--a3);border:2px solid var(--ink);padding:4px 9px 3px;margin:18px 0 9px;
+ transform:skewX(-7deg);box-shadow:3px 3px 0 var(--ink);align-self:flex-start;width:auto}
+.screen[data-p="r"] .sect::after,.screen[data-p="v"] .sect::after{display:none}
+.screen[data-p="v"] .sect{border-width:1.5px;box-shadow:2px 3px 0 rgba(36,21,57,.22);
+ background:linear-gradient(105deg,var(--a1),var(--a3));color:#2B1640}
+
+/* Panels: black rules and a gutter, the way a page is actually ruled. */
+.screen[data-p="r"] .lift,.screen[data-p="r"] .splitcard,.screen[data-p="r"] .sesh,
+.screen[data-p="r"] .cond,.screen[data-p="r"] .strip,.screen[data-p="r"] .teambox{
+ border-width:2.5px;box-shadow:var(--gut) var(--gut) 0 var(--ink)}
+.screen[data-p="v"] .lift,.screen[data-p="v"] .splitcard,.screen[data-p="v"] .sesh,
+.screen[data-p="v"] .cond,.screen[data-p="v"] .strip,.screen[data-p="v"] .teambox{
+ border-width:2px;border-radius:2px;box-shadow:2px 3px 0 rgba(36,21,57,.20)}
+
+/* Out of register. Cyan and magenta plates a hair off the black one - the
+   single most recognisable thing about a cheap colour print, and the reason
+   this theme is called what it is. */
+.screen[data-p="r"] .sect,.screen[data-p="r"] .chip,
+.screen[data-p="r"] .lifthead .nm b{text-shadow:.7px 0 0 rgba(0,150,214,.55),-.7px 0 0 rgba(240,17,46,.45)}
+
+/* Buttons are ACTIONS, but they are not skewed: on a real page the PANELS and
+   the type stay square and only the caption boxes and the sound effects are
+   angled. Skewing the buttons too tilted every label in the app, which reads as
+   a rendering fault rather than as style. They get weight and a hard stamp
+   instead. */
+.screen[data-p="r"] .lnk,.screen[data-p="r"] .sb,.screen[data-p="r"] .rb,
+.screen[data-p="r"] .stp,.screen[data-p="r"] .segb{
+ border-width:2px;box-shadow:2px 2px 0 var(--ink)}
+.screen[data-p="r"] .lnk:active,.screen[data-p="r"] .sb:active,.screen[data-p="r"] .rb:active,
+.screen[data-p="r"] .stp:active{box-shadow:0 0 0 var(--ink);transform:translate(2px,2px)}
+.screen[data-p="v"] .lnk,.screen[data-p="v"] .sb,.screen[data-p="v"] .rb{
+ border-width:1.6px;border-radius:9px;box-shadow:1px 2px 0 rgba(36,21,57,.18)}
+.screen[data-p="v"] .sxlog,.screen[data-p="v"] .seshgo{border-radius:11px}
+/* Gwen's ink is wet, so it pools at the bottom edge of everything instead of
+   casting a hard shadow. */
+.screen[data-p="v"] .lift:after,.screen[data-p="v"] .splitcard:after{
+ content:"";position:absolute;left:6%;right:6%;bottom:-2px;height:5px;pointer-events:none;
+ background:radial-gradient(ellipse 50% 100% at 50% 0,rgba(255,95,168,.40),transparent 70%);
+ filter:blur(2px)}
+.screen[data-p="v"] .lift,.screen[data-p="v"] .splitcard{position:relative}
+
 .screen{--spring:cubic-bezier(.34,1.56,.64,1);--settle:cubic-bezier(.16,1,.3,1)}
 @supports (transition-timing-function:linear(0,1)){
  .screen{
@@ -727,7 +977,12 @@ canvas.tgif{image-rendering:auto}
 .screen button{transition:transform var(--pressD) var(--spring),box-shadow var(--pressD) var(--spring)}
 .sb.justdone,.pip.justdone{animation-timing-function:var(--spring)}
 
-/* the ink splat when a set lands - radiates out, stepped so it reads as drawn */
+/* ---- a set lands ---------------------------------------------------------
+   One ink splat used to answer for every world. It is the single most repeated
+   moment in the app - you see it more often than any screen - so it is the
+   last place where all six should agree. Each world now answers in its own
+   medium, and the neutral pair keep the ink ring, because restraint is their
+   entire brief. */
 .splat{position:absolute;left:50%;top:50%;width:min(520px,140vw);height:min(520px,140vw);
  margin:-260px 0 0 -260px;pointer-events:none;z-index:70;opacity:0}
 .splat.go{animation:splat 620ms steps(9,end) forwards}
@@ -735,6 +990,61 @@ canvas.tgif{image-rendering:auto}
 .splat i{position:absolute;inset:0;border-radius:50%;border:5px solid var(--ok);opacity:.5}
 .splat i:nth-child(2){inset:13%;border-width:3px;border-color:var(--a2);opacity:.38}
 .splat i:nth-child(3){inset:27%;border-width:2px;border-color:var(--a1);opacity:.28}
+
+/* COMIC: the page answers in lettering. A burst behind a word, both stepped,
+   because a printed panel does not ease. */
+.splat[data-k="r"] i,.splat[data-k="v"] i{border-radius:0;border:0;
+ background:var(--a3);opacity:.9;
+ -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0l8 20 16-14-4 22 21-7-14 17 22 4-20 10 17 15-22-2 8 21-17-13-6 22-6-22-17 13 8-21-22 2 17-15-20-10 22-4-14-17 21 7-4-22 16 14z' fill='%23000'/%3E%3C/svg%3E");-webkit-mask-size:contain;-webkit-mask-position:center;-webkit-mask-repeat:no-repeat;
+ mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0l8 20 16-14-4 22 21-7-14 17 22 4-20 10 17 15-22-2 8 21-17-13-6 22-6-22-17 13 8-21-22 2 17-15-20-10 22-4-14-17 21 7-4-22 16 14z' fill='%23000'/%3E%3C/svg%3E");mask-size:contain;mask-position:center;mask-repeat:no-repeat}
+.splat[data-k="r"] i:nth-child(2),.splat[data-k="v"] i:nth-child(2){inset:9%;background:var(--a1);opacity:.85}
+/* the core stays a shade translucent: this fires on every logged set, over the
+   button you are about to press again, and an opaque whiteout mid-session is a
+   different thing from a flourish */
+.splat[data-k="r"] i:nth-child(3),.splat[data-k="v"] i:nth-child(3){inset:20%;background:var(--card);opacity:.9}
+/* It has to HOLD long enough to be read. The shared curve front-loads, so the
+   burst was already at a tenth of its opacity before the eye got to it - which
+   is how you end up with an effect that only exists in the code. It also stops
+   well short of full size: a burst the width of the screen is not an accent,
+   it is a whiteout over the thing you just logged. */
+.splat[data-k="r"].go,.splat[data-k="v"].go{animation:splatC 760ms steps(7,end) forwards}
+@keyframes splatC{0%{opacity:0;transform:scale(.18) rotate(-5deg)}
+ 16%{opacity:1;transform:scale(.50) rotate(1deg)}
+ 58%{opacity:1;transform:scale(.55) rotate(0deg)}
+ 100%{opacity:0;transform:scale(.60) rotate(3deg)}}
+.splat b{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%) rotate(var(--rot,-6deg));
+ text-align:center;font-family:var(--disp);font-size:64px;line-height:1;letter-spacing:.02em;
+ color:var(--ink);text-shadow:2px 2px 0 var(--a3),-2px -2px 0 var(--a2);pointer-events:none}
+.splat[data-k="v"] b{text-shadow:2px 2px 0 var(--a3),-2px -2px 0 var(--a2),0 0 14px rgba(255,95,168,.5)}
+
+/* FLAME: a flare, not a ring. Soft edges, warm core, gone quickly. */
+.splat[data-k="e"]{mix-blend-mode:screen}
+.splat[data-k="e"].go{animation:splatE 720ms ease-out forwards}
+@keyframes splatE{0%{opacity:0;transform:scale(.16)}
+ 13%{opacity:1;transform:scale(.52)}
+ 48%{opacity:.82;transform:scale(.78)}
+ 100%{opacity:0;transform:scale(1)}}
+.splat[data-k="e"] i{border:0;border-radius:50%;filter:blur(14px);
+ background:radial-gradient(circle,rgba(255,217,160,.95) 0%,var(--a2) 32%,var(--a1) 58%,transparent 72%)}
+.splat[data-k="e"] i:nth-child(2){inset:22%;filter:blur(7px);opacity:.75}
+.splat[data-k="e"] i:nth-child(3){inset:40%;filter:blur(3px);opacity:.9;
+ background:radial-gradient(circle,#FFF3DE 0%,var(--a2) 55%,transparent 70%)}
+
+/* PETALS: they scatter and drift rather than radiate. */
+.splat[data-k="b"].go{animation:splatB 1100ms ease-out forwards}
+@keyframes splatB{0%{opacity:0;transform:scale(.20) rotate(-9deg)}
+ 15%{opacity:.95;transform:scale(.55) rotate(-3deg)}
+ 55%{opacity:.75;transform:scale(.76) rotate(3deg)}
+ 100%{opacity:0;transform:scale(.92) rotate(9deg)}}
+/* --a3 here is the pale jade, which turned every petal grey-green; wisteria
+   and sakura are the two things this theme is made of, so the petals are
+   rose into lilac and nothing else */
+.splat[data-k="b"] i{border:0;border-radius:0;opacity:.85;
+ background:radial-gradient(circle at 42% 38%,#EE8FB4 0%,var(--a1) 42%,#C9A7FF 100%);
+ -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23000'%3E%3Cellipse cx='18' cy='26' rx='6' ry='3.4' transform='rotate(-24 18 26)'/%3E%3Cellipse cx='44' cy='12' rx='5' ry='3' transform='rotate(16 44 12)'/%3E%3Cellipse cx='74' cy='24' rx='6.5' ry='3.6' transform='rotate(38 74 24)'/%3E%3Cellipse cx='88' cy='54' rx='5' ry='3' transform='rotate(-12 88 54)'/%3E%3Cellipse cx='70' cy='82' rx='6' ry='3.4' transform='rotate(-40 70 82)'/%3E%3Cellipse cx='40' cy='90' rx='5.5' ry='3.2' transform='rotate(22 40 90)'/%3E%3Cellipse cx='12' cy='62' rx='6' ry='3.4' transform='rotate(52 12 62)'/%3E%3Cellipse cx='58' cy='48' rx='4.4' ry='2.6' transform='rotate(-8 58 48)'/%3E%3C/g%3E%3C/svg%3E");-webkit-mask-size:contain;-webkit-mask-position:center;-webkit-mask-repeat:no-repeat;
+ mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23000'%3E%3Cellipse cx='18' cy='26' rx='6' ry='3.4' transform='rotate(-24 18 26)'/%3E%3Cellipse cx='44' cy='12' rx='5' ry='3' transform='rotate(16 44 12)'/%3E%3Cellipse cx='74' cy='24' rx='6.5' ry='3.6' transform='rotate(38 74 24)'/%3E%3Cellipse cx='88' cy='54' rx='5' ry='3' transform='rotate(-12 88 54)'/%3E%3Cellipse cx='70' cy='82' rx='6' ry='3.4' transform='rotate(-40 70 82)'/%3E%3Cellipse cx='40' cy='90' rx='5.5' ry='3.2' transform='rotate(22 40 90)'/%3E%3Cellipse cx='12' cy='62' rx='6' ry='3.4' transform='rotate(52 12 62)'/%3E%3Cellipse cx='58' cy='48' rx='4.4' ry='2.6' transform='rotate(-8 58 48)'/%3E%3C/g%3E%3C/svg%3E");mask-size:contain;mask-position:center;mask-repeat:no-repeat}
+.splat[data-k="b"] i:nth-child(2){inset:16%;transform:rotate(38deg);opacity:.6}
+.splat[data-k="b"] i:nth-child(3){inset:32%;transform:rotate(-27deg);opacity:.45}
 @media (prefers-reduced-motion:reduce){.splat{display:none}}
 
 /* the gesture zones, drawn faintly so the split is discoverable */
@@ -1282,7 +1592,7 @@ try{if(window.__HALFTONE_NATIVE__||window.ReactNativeWebView){
     <div class="exlist" id="exlist" hidden></div></div>
   <div id="restHost"></div><div class="toast" id="toast"></div>
   <div class="wipe" id="wipe"><i></i><i></i><i></i></div>
-  <div class="splat" id="splat"><i></i><i></i><i></i></div>
+  <div class="splat" id="splat"><i></i><i></i><i></i><b hidden></b></div>
   <i class="regmark tl"></i><i class="regmark tr"></i><i class="regmark bl"></i><i class="regmark br"></i>
   <div class="pinpad" id="pinpad" hidden><div class="pinin">
     <p class="pintitle" id="pinWho"></p>
@@ -1859,12 +2169,14 @@ var THEME={r:{a1:'#F0112E',paper:'#E7E5DC',ink:'#131219'},v:{a1:'#FF5FA8',paper:
 /* Bumped on every shipped page. Shown in Settings so 'did the update land?'
    is a thing you can read rather than guess at. */
 var WEB_BUILD='w12-media-restored';
-var THEMES={r:{name:'Screenprint',note:'Hard edges, halftone dots, misregistered ink. Fast and mechanical.'},
-            v:{name:'Watercolour',note:'Pigment past the line. Soft, springy, pastel.'},
+/* Two pairs and two loners. Each pair shares a grammar - lettering, panels,
+   rules, the way a screen arrives - and disagrees about the medium. */
+var THEMES={r:{name:'Screenprint',note:'A comic page, printed. Lettering, caption boxes, halftone, ink out of register.'},
+            v:{name:'Watercolour',note:'The same page, painted wet. Pigment past the line, soft and springy.'},
             g:{name:'Paper',note:'Flat and neutral. Barely reacts.'},
             c:{name:'Slate',note:'Calm. Cool light, one muted accent, slow settle.'},
-            e:{name:'Ember',note:'The forge at night. Charcoal, heat, quick to commit.'},
-            b:{name:'Blossom',note:'Washed rose and jade. Everything flows and overshoots.'}};
+            e:{name:'Ember',note:'A forge at night. Mincho on washi, a flame hem along every edge.'},
+            b:{name:'Blossom',note:'That world in daylight. Wisteria, jade, everything flows and overshoots.'}};
 function safe(fn,l){return function(){try{return fn.apply(this,arguments);}catch(e){console.error(l||'h',e);toast('Something went wrong — nothing was lost.');};};}
 var store={get:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},
  set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){return false;}}};
@@ -2019,17 +2331,23 @@ function U(){ensureDB();return DB.users[DB.active];}
 var COPY={
  g:{go:'Start session',cont:'Continue session',goSub:'one lift at a time, hands-free',
     next:'Up next',pre:'Before you go',who:'Who is<br><b>training</b>',done:'Every set logged. Nothing left to do today.'},
- r:{go:'Start session',cont:'Continue session',goSub:'one lift at a time, hands-free',
-    next:'Up next',pre:'Before you go',who:'Who is<br><b>training</b>',done:'Every set logged. Nothing left to do today.'},
- v:{go:'Start session',cont:'Carry on',goSub:'one lift at a time, hands-free',
-    next:'Up next',pre:'Before you go',who:'Who is<br><b>training</b>',done:'Every set logged. Nothing left to do today.'},
+ /* The two worlds should not only look different, they should SOUND
+    different - but only in the flavour lines. Every label that tells you what
+    a thing IS stays plain, because a person mid-set reading "Up next" should
+    not have to decode a metaphor to find their next lift. */
+ r:{go:'Start the run',cont:'Back in',goSub:'one lift at a time, hands-free',
+    next:'Up next',pre:'Before you swing out',who:'Who is<br><b>suiting up</b>',
+    done:'Every set logged. That is the whole page.'},
+ v:{go:'Begin',cont:'Carry on',goSub:'one lift at a time, hands-free',
+    next:'Up next',pre:'Before you go',who:'Who is<br><b>in frame</b>',
+    done:'Every set logged. Let it dry.'},
  c:{go:'Begin',cont:'Resume',goSub:'one lift at a time',
     next:'Next',pre:'Before you start',who:'Who is<br><b>training</b>',done:'All sets logged. Nothing further today.'},
  e:{go:'Ignite',cont:'Back to the forge',goSub:'one breath, one lift, all the way',
     next:'Next form',pre:'Before the forge',who:'Who takes<br><b>the field</b>',
     done:'Every set logged. The forge is cold until tomorrow.'},
  b:{go:'Begin',cont:'Pick it back up',goSub:'one lift at a time, carried through',
-    next:'Next in bloom',pre:'Before you go',who:'Who is<br><b>training</b>',
+    next:'Next in bloom',pre:'Before the first bloom',who:'Who takes<br><b>the first step</b>',
     done:'Every set logged. Nothing left but to rest.'}};
 function tx(k,fb){var c=COPY[themeKey()]||{};
  return c[k]!=null?c[k]:(COPY.g[k]!=null?COPY.g[k]:(fb||''));}
@@ -2548,19 +2866,19 @@ function renderTrain(){
   var last=lastSession();
   viewEl.innerHTML='<div class="sect">Today</div>'+
    '<div style="border:1.5px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:14px;margin-bottom:12px">'+
-   '<b style="font-family:Anton,sans-serif;font-size:19px;text-transform:uppercase;display:block;margin-bottom:5px">Rest day</b>'+
+   '<b style="font-family:var(--disp);font-size:19px;text-transform:uppercase;display:block;margin-bottom:5px">Rest day</b>'+
    '<p style="margin:0;font-size:11.5px;line-height:1.5;color:var(--mut)">Your '+curSplit().name+
    ' split has nothing scheduled. Rest is part of the plan, not a gap in it.</p></div>'+
    readyLine()+
    (last?'<div class="sect">Last session</div><div style="border:1.5px solid var(--ink);padding:10px;margin-bottom:12px">'+
-     '<b style="font-family:Anton,sans-serif;font-size:14px;text-transform:uppercase">'+last.name+'</b>'+
+     '<b style="font-family:var(--disp);font-size:14px;text-transform:uppercase">'+last.name+'</b>'+
      '<p style="margin:4px 0 0;font-size:11px;color:var(--mut)">'+last.sets+' sets across '+last.lifts+' lifts &middot; '+last.ago+'</p></div>':'')+
    '<div class="sect">Next up &middot; '+nx.dayName+'</div>'+
    '<div style="border:1.5px solid var(--ink);box-shadow:3px 3px 0 var(--ink);padding:10px;margin-bottom:12px">'+
-   '<b style="font-family:Anton,sans-serif;font-size:16px;text-transform:uppercase;display:block">'+nx.day.name+'</b>'+
+   '<b style="font-family:var(--disp);font-size:16px;text-transform:uppercase;display:block">'+nx.day.name+'</b>'+
    '<p style="margin:3px 0 7px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)">'+nx.day.focus+'</p>'+
    nx.day.lifts.map(function(l){var e=EXD[l[0]];return e?'<div style="display:flex;gap:8px;align-items:baseline;padding:3px 0;font-size:11.5px">'+
-     '<span style="color:var(--a1);font-family:Anton,sans-serif">'+l[1]+'\u00d7</span><span style="flex:1">'+e.name+'</span>'+
+     '<span style="color:var(--a1);font-family:var(--disp)">'+l[1]+'\u00d7</span><span style="flex:1">'+e.name+'</span>'+
      '<span style="font-size:9px;color:var(--mut)">'+l[2]+'\u2013'+l[3]+'</span></div>':'';}).join('')+'</div>'+
    '<button class="lnk" id="trainAnyway" style="width:100%;margin-bottom:6px">Train '+nx.day.name+' anyway</button>'+
    '<button class="lnk" id="swap" style="width:100%;margin-bottom:4px">Shift plan by a day</button>'+
@@ -2679,9 +2997,25 @@ function sxControl(id){
   (cur?'<p class="sxrule">'+SX_STATES[cur].rule+'</p>':'')+'</div>';}
 /* Logging a set used to re-render the whole list, which destroyed and recreated the
    exercise <img> - the GIF snapped back to frame 0 on every tap. These mutate in place. */
+/* Generic comic onomatopoeia, not anyone's catchphrase - and deliberately
+   short, because this fires on every logged set and a sentence would wear out
+   by the third one. */
+var SFX={r:['KRAK!','BAM!','WHAM!','THUD!','SNAP!','KAPOW!'],
+         v:['CLEAN!','NAILED IT','LOCKED','YES!','THAT ONE']};
 function splat(){var e=document.getElementById('splat');if(!e||RM)return;
+ var k=themeKey();
+ try{
+  e.setAttribute('data-k',k);
+  var b=e.querySelector('b'),w=SFX[k];
+  if(b){
+   if(w&&w.length){
+    b.textContent=w[Math.floor(Math.random()*w.length)];
+    b.style.setProperty('--rot',(Math.random()*14-7).toFixed(1)+'deg');
+    b.hidden=false;
+   }else b.hidden=true;}
+ }catch(err){}
  e.classList.remove('go');void e.offsetWidth;e.classList.add('go');
- setTimeout(function(){try{e.classList.remove('go');}catch(err){}},700);}
+ setTimeout(function(){try{e.classList.remove('go');e.removeAttribute('data-k');}catch(err){}},1200);}
 function pop(el,cls){if(!el)return;cls=cls||'justdone';
  el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);
  setTimeout(function(){try{el.classList.remove(cls);}catch(e){}},720);}
@@ -2852,7 +3186,7 @@ function renderPlan(){
   weekArr().map(function(d,i){var day=DAYS[d]||DAYS.rest;var rest=!day.lifts.length;
    return '<div style="display:flex;gap:9px;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.08);'+
     (i===today?'font-weight:700':'opacity:'+(rest?'.45':'.8'))+'">'+
-    '<span style="width:30px;font-family:Anton,sans-serif;font-size:11px;text-transform:uppercase">'+
+    '<span style="width:30px;font-family:var(--disp);font-size:11px;text-transform:uppercase">'+
       ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i]+'</span>'+
     '<span style="flex:1;font-size:12px">'+day.name+'</span>'+
     '<span style="font-size:9.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em">'+
@@ -4671,7 +5005,8 @@ function applyTempo(){var t=tempo(),s=screenEl.style,E=ENTER[themeKey()]||ENTER.
  s.setProperty('--fxD',   Math.round(BASE.burst*t)+'ms');
  s.setProperty('--inD',   E.d+'ms');
  s.setProperty('--inE',   E.e);
- s.setProperty('--st',    E.st+'ms');}
+ s.setProperty('--st',    E.st+'ms');
+ flagFont();}   /* a theme change is also a change of display face */
 var sliding=false,_slideGuard=null;
 /* A transition that throws part way through used to leave `sliding` latched on
    for good, and a latched flag means every tab, every Back and every swipe is
@@ -5206,6 +5541,55 @@ document.getElementById('btnGear').onclick=safe(toggleSettings,'gr');
    failure during boot - which is the only one that leaves you looking at an
    empty screen with nothing to tap. Rejections were not covered at all, and a
    fault inside a render loop could raise the same toast on every frame. */
+/* ---- display type: measured, not assumed ---------------------------------
+   Four themes size their headlines against a specific display face. When that
+   face arrives those numbers are right; when it does not - offline first run,
+   a blocked or slow CDN, a locked-down network - the fallback has different
+   metrics and the same numbers overflow, wrap to three lines or collide. So
+   the corrections are gated on the face actually being present, and this is
+   what reports it.
+
+   Only the face the CURRENT theme needs is ever requested. Pulling all seven
+   display families at boot would download six that this person may never look
+   at; asking for one, when they choose it, costs a latin subset. */
+var THEMEFONT={r:['Bangers',400,'f-bangers'],    v:['Bangers',400,'f-bangers'],
+               g:['Anton',400,'f-anton'],        c:['Outfit',700,'f-outfit'],
+               e:['Shippori Mincho B1',700,'f-mincho'],
+               b:['Zen Old Mincho',700,'f-oldmincho']};
+/* document.fonts.check() looked like the answer and is not: these families
+   ship as dozens of unicode-range subsets, and Chrome reports false for a
+   family that is demonstrably rendering if any sibling subset is unloaded or
+   errored. Measuring is the question we actually care about anyway - "is the
+   text going to come out the width these numbers were measured at" - so we
+   measure. Two different fallbacks, in case a face happens to match one. */
+var _fc=null;
+function _tw(stack,w){
+ if(!_fc){var cv=document.createElement('canvas');_fc=cv.getContext&&cv.getContext('2d');}
+ if(!_fc)return 0;
+ _fc.font=w+' 42px '+stack;
+ return _fc.measureText('MHWmhw0123 \u2014 incline dumbbell').width;}
+function faceReady(fam,w){
+ try{
+  var q='"'+fam+'",';
+  if(Math.abs(_tw(q+'monospace',w)-_tw('monospace',w))>0.5)return true;
+  return Math.abs(_tw(q+'serif',w)-_tw('serif',w))>0.5;
+ }catch(e){return false;}}
+function flagFont(){
+ try{
+  var f=THEMEFONT[themeKey()];if(!f)return;
+  var root=document.documentElement,cls=f[2];
+  if(root.classList.contains(cls))return;
+  if(faceReady(f[0],f[1])){root.classList.add(cls);return;}
+  var spec=f[1]+' 16px "'+f[0]+'"';
+  /* not there yet: ask for it, then look again a few times. A cold cache on
+     gym wifi can take seconds, and a face that lands late must still be picked
+     up rather than leaving the theme permanently on fallback metrics. */
+  try{if(document.fonts&&document.fonts.load)document.fonts.load(spec,'Ag')['catch'](function(){});}catch(e){}
+  [120,500,1500,4000].forEach(function(ms){
+   setTimeout(function(){
+    try{if(!root.classList.contains(cls)&&faceReady(f[0],f[1]))root.classList.add(cls);}catch(e){}
+   },ms);});
+ }catch(e){}}
 var _errT=0;
 function reportErr(e){
  try{console.error(e);}catch(x){}
