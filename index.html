@@ -2168,7 +2168,7 @@ var THEME={r:{a1:'#F0112E',paper:'#E7E5DC',ink:'#131219'},v:{a1:'#FF5FA8',paper:
    any of these; the profile still decides the data, the theme only the feel. */
 /* Bumped on every shipped page. Shown in Settings so 'did the update land?'
    is a thing you can read rather than guess at. */
-var WEB_BUILD='w12-media-restored';
+var WEB_BUILD='w13-media-merge';
 /* Two pairs and two loners. Each pair shares a grammar - lettering, panels,
    rules, the way a screen arrives - and disagrees about the medium. */
 var THEMES={r:{name:'Screenprint',note:'A comic page, printed. Lettering, caption boxes, halftone, ink out of register.'},
@@ -5285,6 +5285,7 @@ function navPush(){
  if(top&&top.v===e.v&&top.id===e.id&&top.i===e.i)return;   /* no self-repeats */
  backStack.push(e);
  if(backStack.length>25)backStack.shift();
+ histPush();
  btnBack.hidden=false;}
 function navShow(e,dir){
  if(!e)return;
@@ -5317,6 +5318,8 @@ function go(t,dir){
     and what eventually threw you out to Today from a tab you had never
     descended from. Arriving at a root means there is nothing above you. */
  backStack.length=0;btnBack.hidden=true;
+ /* a tab that is not the primary one is a place Back should return from */
+ if(t!==TABS[0])histPush();
  var from=view;
  if(dir==null){var a=TABS.indexOf(from),b2=TABS.indexOf(t);dir=(a<0||b2>a)?1:(b2<a?-1:0);}
  selectTab(t);
@@ -5338,6 +5341,28 @@ function goBack(){
     wherever you were, which meant Back on Body closed Halftone outright. */
  if(TABS.indexOf(view)>0){go(TABS[0],-1);return true;}
  backExhausted();return false;}
+/* ---- Back, when there is no native shell to bridge it ----
+   Installed from a browser there is no hardware-back hook, so Android's back key
+   walks browser history. Each screen you descend into pushes one entry; popstate
+   then peels one layer off the app instead of closing it, and only a back press
+   with nothing left to peel is allowed to leave. */
+function histPush(){
+ if(inNativeShell())return;
+ try{history.pushState({hf:1},'');}catch(e){}}
+try{
+ window.addEventListener('popstate',function(){
+  if(inNativeShell())return;
+  var handled=false;
+  try{handled=goBack();}catch(e){}
+  /* keep one spare entry so the next press has something to pop; when goBack
+     reports nothing left, the browser has already stepped out and should. */
+  if(handled)histPush();
+ });
+}catch(e){}
+/* Ask the browser to keep this data rather than treat it as evictable cache.
+   Installed apps are normally granted it; it is silent either way, and the log
+   is the one thing here that must not quietly disappear. */
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 function backExhausted(){
  try{if(window.ReactNativeWebView)
   window.ReactNativeWebView.postMessage(JSON.stringify({type:'back-exhausted'}));}catch(e){}}
