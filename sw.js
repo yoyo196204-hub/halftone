@@ -16,7 +16,13 @@
    Anything unexpected falls through to the network untouched. A worker that
    throws must not be able to take the app down with it. */
 
-var V='halftone-v1',
+/* Bump V whenever a CACHE-FIRST asset changes - the icons, or any demo file
+   replaced under a name it already had. Activate deletes every cache that is
+   not the current V, so the new bytes are fetched once and kept. Without the
+   bump an installed phone keeps serving the old icons forever: cache-first is
+   exactly what it says, and index.html being network-first does not help the
+   files it references. */
+var V='halftone-v2',
     EAGER=['./index.html','./manifest.webmanifest','./favicon-32.png','./apple-touch-icon.png'];
 
 self.addEventListener('install',function(e){

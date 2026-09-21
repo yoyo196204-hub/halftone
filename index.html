@@ -318,6 +318,30 @@ h1.t span.ch{display:inline-block}
  .plate .im:before,.plate .im:after{animation:none;opacity:0}
  .plate img,.tgif{transition:none;opacity:1;transform:none}}
 
+/* ---- install nudge ------------------------------------------------------
+   Sits in the flow of the Today screen, not over it. It borrows the card
+   treatment each theme already defines, so it reads as part of the app rather
+   than as a browser banner - which is the thing people reflexively dismiss. */
+.instnudge{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+ border:1.5px solid var(--a2);background:var(--card);color:var(--ink);
+ padding:9px 10px;margin:0 0 10px;cursor:pointer;font-family:inherit;
+ box-shadow:3px 3px 0 var(--a2)}
+.instnudge:active{box-shadow:1px 1px 0 var(--a2);transform:translate(2px,2px)}
+.instnudge .ii{flex:0 0 auto;width:22px;height:22px;position:relative;border:1.6px solid var(--a2);border-radius:4px}
+.instnudge .ii:before{content:"";position:absolute;left:50%;top:4px;width:1.6px;height:9px;
+ margin-left:-.8px;background:var(--a2)}
+.instnudge .ii:after{content:"";position:absolute;left:50%;top:8px;width:6px;height:6px;
+ margin-left:-3px;border-right:1.6px solid var(--a2);border-bottom:1.6px solid var(--a2);
+ transform:rotate(45deg)}
+.instnudge .it{flex:1;min-width:0}
+.instnudge .it b{display:block;font-family:var(--disp);font-size:14px;text-transform:uppercase;line-height:1.1}
+.instnudge .it i{display:block;font-style:normal;font-size:10px;line-height:1.4;color:var(--mut);margin-top:2px}
+.instnudge .ix{flex:0 0 auto;width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+ font-size:17px;line-height:1;color:var(--mut);border:1px solid transparent}
+.instnudge .ix:active{border-color:var(--mut)}
+.screen[data-p="e"] .instnudge,.screen[data-p="b"] .instnudge{box-shadow:none;border-width:1px}
+.screen[data-p="v"] .instnudge{border-radius:9px;box-shadow:1px 2px 0 rgba(36,21,57,.18)}
+.screen[data-p="c"] .instnudge{box-shadow:0 1px 2px rgba(27,35,40,.05),0 6px 18px -10px rgba(27,35,40,.18)}
 .plnote{margin:-6px 0 10px;font-size:10px;line-height:1.4;letter-spacing:.04em;text-transform:uppercase;
  color:var(--mut);border-left:2px solid var(--a3);padding:3px 0 3px 7px}
 .tgif{width:100%;height:100%;object-fit:contain;display:block;mix-blend-mode:var(--gifb);background:var(--card);filter:var(--giff)}
@@ -2900,7 +2924,7 @@ function renderTrain(){
  var kit={};p.lifts.forEach(function(l){((EXD[l[0]]||{}).equip||'').split('·').forEach(function(x){
   x=x.trim();if(x)kit[x]=1;});});
  if(phase==='before'){
-  viewEl.innerHTML=sessionCard(p,done,total)+readyLine()+
+  viewEl.innerHTML=sessionCard(p,done,total)+readyLine()+installNudge()+
    '<div class="sect">'+tx('pre')+'</div>'+
    '<div class="kit"><em>You will need</em><p>'+Object.keys(kit).join(' &middot; ')+'</p></div>'+
    todayCardioLine()+todayDietLine()+
@@ -2920,6 +2944,7 @@ function renderTrain(){
     (showAllLifts?'Hide the lift list':'Review what you logged')+'</button>'+
    (showAllLifts?p.lifts.map(liftCard).join(''):'');
  }
+ wireInstallNudge();
  var sa=document.getElementById('showAll');
  if(sa)sa.onclick=safe(function(){showAllLifts=!showAllLifts;renderTrain();},'sa');
  var th=document.getElementById('toHistory');
@@ -4566,6 +4591,33 @@ var EVIDENCE=[
  {g:'none',c:'Step counts are not converted into calories.',
   s:'Steps track free-living activity well; the conversion to energy does not survive contact with reality.'}];
 var GRADEN={strong:'Strong',moderate:'Moderate',weak:'Weak',none:'Not done, on purpose'};
+/* ---- the install offer, where it can actually be found -------------------
+   This existed only as a block near the bottom of Settings, under the rest
+   timings and the evidence index. Nobody scrolls there to look for something
+   they do not know exists, so in practice the app could not be installed even
+   once it became installable. It gets one quiet line on the Today screen now,
+   shown only when the browser has actually offered the prompt, and dismissed
+   for good the moment it is used or waved off. The Settings block stays for
+   anyone who comes looking later. */
+function installNudge(){
+ try{
+  if(installState()!=='ready')return '';   /* installed, or no prompt offered */
+  if(U().noInstall)return '';
+  return '<button class="instnudge" id="instNudge">'+
+   '<span class="ii" aria-hidden="true"></span>'+
+   '<span class="it"><b>Put it on your home screen</b>'+
+   '<i>Its own icon, no browser bars, and it keeps working with no signal.</i></span>'+
+   '<span class="ix" id="instNo" role="button" aria-label="Not now">&times;</span></button>';
+ }catch(e){return '';}}
+function wireInstallNudge(){
+ var n=document.getElementById('instNudge');if(!n)return;
+ var x=document.getElementById('instNo');
+ if(x)x.onclick=safe(function(ev){
+  ev.stopPropagation();U().noInstall=1;save();
+  try{n.remove();}catch(e){}
+  toast('Hidden. It is still in Settings if you change your mind.');},'inx');
+ n.onclick=safe(function(){
+  if(!doInstall())toast('Your browser did not offer the install prompt.');},'inn');}
 function installBlock(){
  var st=installState();
  if(st==='installed')
@@ -5676,12 +5728,23 @@ function swUpdateReady(reg){
     })
     .catch(function(){SWOK=false;});});
  }catch(e){}})();
-/* Android fires this instead of showing its own prompt, so the offer lives in
-   Settings where it can be explained rather than as a banner nobody trusts. */
+/* Android fires this instead of showing its own prompt, so the offer is ours to
+   place and explain rather than a banner nobody trusts.
+
+   It arrives well AFTER the first render - Chrome waits for engagement before
+   offering it at all - so whatever is on screen has already been drawn without
+   it. Redrawing only Settings meant the Today nudge could never appear on the
+   screen you are actually looking at when the prompt lands. */
 var INSTALL=null;
+function installRefresh(){
+ try{if(view==='settings')renderSettings();
+     else if(view==='train')renderTrain();}catch(e){}}
 window.addEventListener('beforeinstallprompt',function(e){
- e.preventDefault();INSTALL=e;
- try{if(view==='settings')renderSettings();}catch(err){}});
+ e.preventDefault();INSTALL=e;installRefresh();});
+/* and once it is installed the offer has to stop being made */
+window.addEventListener('appinstalled',function(){
+ INSTALL=null;try{toast('Installed. Open it from your home screen.');}catch(e){}
+ installRefresh();});
 function installState(){
  var standalone=false;
  try{standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}catch(e){}
@@ -5690,5 +5753,5 @@ function installState(){
 function doInstall(){
  if(!INSTALL)return false;
  try{INSTALL.prompt();INSTALL.userChoice.then(function(){INSTALL=null;
-  try{if(view==='settings')renderSettings();}catch(e){}});return true;}catch(e){return false;}}
+  installRefresh();});return true;}catch(e){return false;}}
 </script>
