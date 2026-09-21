@@ -99,8 +99,14 @@ html.bleed .phone{width:100%;max-width:none;height:100%;aspect-ratio:auto;border
 /* ---- EMBER: charcoal and heat. The only dark theme; the ink inverts. ---- */
 .screen[data-p="e"]{--paper:#17131A;--card:#221A1F;--ink:#F3E9E2;--a1:#E2502A;--a2:#F0A32C;--a3:#8A2F2B;
  --ok:#63BE7B;--mut:#9C8880;--onacc:#F7EDE6;--onhot:#FFF6F0;--panel:#0E0B10;--onpanel:#F3E9E2;--grain:0;
- --dots:.05;--giff:contrast(1.1) saturate(1.05) brightness(1.06);--gifb:screen;
+ --dots:.05;--giff:contrast(1.1) saturate(1.05) brightness(1.06);
  --wipe1:#E2502A;--wipe2:#F0A32C;--wipe3:#8A2F2B;--wipeblur:10px;--wipeop:.7}
+/* --gifb is deliberately NOT set here. The demonstrations are black line art on
+   white, so screen-blending them onto charcoal erases the figure; Ember gives
+   the media a lit panel to stand on instead, and sets the blend to multiply
+   with it further down. The declaration that used to sit on this line said
+   `screen`, lost to that later rule, and read as the truth to anyone
+   scanning the theme. */
 /* heat rising off the ground, strongest at the base */
 .screen[data-p="e"]::before{opacity:1;mix-blend-mode:screen;
  background:radial-gradient(ellipse 120% 42% at 50% 104%,rgba(226,80,42,.30),transparent 68%),
@@ -251,10 +257,35 @@ h1.t span.ch{display:inline-block}
  font-size:9px;letter-spacing:.11em;text-transform:uppercase;padding:4px 8px 4px 7px;font-weight:700}
 .plate .lp{position:absolute;right:0;bottom:0;z-index:3;font-size:7.5px;letter-spacing:.06em;text-transform:uppercase;
  color:var(--mut);background:var(--card);padding:2px 5px;border-top:1.2px solid var(--ink);border-left:1.2px solid var(--ink)}
-.plate:before{content:"";position:absolute;left:0;right:0;top:0;height:22px;z-index:2;pointer-events:none;
- background-image:radial-gradient(var(--ink) .65px,transparent .75px);background-size:3.6px 3.6px;opacity:.22}
-.plate.noimg .im{display:none}
-.plate.noimg:after{content:"Diagram unavailable";display:block;padding:14px;font-size:10px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+/* The halftone strip is ink, so it has to obey the theme's ink setting like
+   everything else does. It was pinned at .22 for every world, which meant Slate
+   - whose whole point is that the halftone is switched OFF - still had a band
+   of dots across the top of every demonstration. */
+.plate:before{content:"";position:absolute;left:0;right:0;top:0;height:22px;z-index:6;pointer-events:none;
+ background-image:radial-gradient(var(--ink) .65px,transparent .75px);background-size:3.6px 3.6px;
+ opacity:calc(var(--dots,.07) * 1.4)}
+/* ---- the plate belongs to its world -------------------------------------
+   The demonstration is the one photographic thing in a drawn app, so each
+   theme reconciles it differently: the screenprint misregisters it, the
+   watercolour lets it bleed into the paper, the forge lights it from below,
+   Blossom sets it on a petal ground, and Slate leaves it alone entirely. */
+/* :before is the halftone strip, :after is the frame - the two pseudo-elements
+   on .im are already spoken for by the loading placeholder and must stay that
+   way, or the sheen never clears on the themes that borrow them. */
+.plate:after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none}
+.screen[data-p="r"] .plate:after{box-shadow:inset 1.5px 0 0 rgba(0,150,214,.34),
+ inset -1.5px 0 0 rgba(240,17,46,.30)}
+.screen[data-p="v"] .plate,.screen[data-p="b"] .plate{border-radius:3px}
+.screen[data-p="v"] .plate:after{box-shadow:inset 0 0 24px -5px rgba(255,95,168,.34)}
+.screen[data-p="b"] .plate:after{box-shadow:inset 0 0 24px -5px rgba(212,82,126,.30)}
+.screen[data-p="e"] .plate:after{box-shadow:inset 0 -14px 20px -16px rgba(240,163,44,.55)}
+.screen[data-p="c"] .plate{border-width:1px;border-color:rgba(27,35,40,.16)}
+.screen[data-p="c"] .plate:after{box-shadow:none}
+/* .noimg used to turn a failed plate into the words "Diagram unavailable".
+   Nothing sets it now and nothing should: a failed plate is replaced by the
+   schematic, which is an actual answer to "how does this movement go" rather
+   than an apology. The rules are gone rather than left dangling - they also
+   claimed :after, which the frame above needs. */
 /* ---- media loading state ------------------------------------------------
    A 100 KB animated GIF decodes on a background thread and then SNAPS in. Six
    of those snapping in at different moments as you scroll is most of what read
@@ -285,6 +316,7 @@ h1.t span.ch{display:inline-block}
 .plnote{margin:-6px 0 10px;font-size:10px;line-height:1.4;letter-spacing:.04em;text-transform:uppercase;
  color:var(--mut);border-left:2px solid var(--a3);padding:3px 0 3px 7px}
 .tgif{width:100%;height:100%;object-fit:contain;display:block;mix-blend-mode:var(--gifb);background:var(--card);filter:var(--giff)}
+canvas.tgif{image-rendering:auto}
 /* comic panels */
 .strip2{display:flex;align-items:stretch;gap:5px;margin-bottom:9px}
 .pnl{flex:1;border:1.5px solid var(--ink);background:var(--paper);position:relative;aspect-ratio:1/1.05;overflow:hidden;
@@ -676,8 +708,13 @@ h1.t span.ch{display:inline-block}
 /* On the dark ground the demo frames read as lit panels rather than white holes:
    they get their own paper and the blend goes back to multiply. */
 .screen[data-p="e"]{--gifb:multiply}
-.screen[data-p="e"] .thumb,.screen[data-p="e"] .plate .im,.screen[data-p="e"] .plate,
+/* A lit panel in a dark room: the media keeps its own paper so the line art
+   survives, and the forge shows through underneath it. */
+.screen[data-p="e"] .thumb,.screen[data-p="e"] .plate,
 .screen[data-p="e"] .tgif,.screen[data-p="e"] .pnl{background:#EDE4DC}
+.screen[data-p="e"] .plate .im{background:radial-gradient(ellipse 86% 56% at 50% 108%,
+ rgba(226,80,42,.21),transparent 72%) #EDE4DC}
+.screen[data-p="e"] .plate .im:before{background:#EDE4DC}
 .screen[data-p="e"] .plate .lp{background:#EDE4DC;color:#6B5B52}
 .screen[data-p="v"] h1.t{letter-spacing:-.01em;font-weight:900}
 .screen{--spring:cubic-bezier(.34,1.56,.64,1);--settle:cubic-bezier(.16,1,.3,1)}
@@ -1092,14 +1129,15 @@ h1.t span.ch{display:inline-block}
 .pad.enter .lift:nth-of-type(6){animation-delay:calc(var(--st,30ms)*5)}
 .pad.enter .lift:nth-of-type(n+7){animation-delay:calc(var(--st,30ms)*6)}
 .pad.enter .vb:nth-of-type(1){animation-delay:calc(var(--st,30ms)*.6)}
-.screen[data-p="r"]{--inD:240ms;--inE:cubic-bezier(.12,.86,.25,1);--st:26ms}
-.screen[data-p="v"]{--inD:420ms;--inE:cubic-bezier(.16,1,.3,1);--st:48ms}
-.screen[data-p="g"]{--inD:300ms;--inE:cubic-bezier(.16,1,.3,1);--st:34ms}
-.screen[data-p="c"]{--inD:520ms;--inE:cubic-bezier(.16,1,.3,1);--st:38ms}
-/* Ember strikes: quick to commit, long to settle. Blossom flows: nothing
-   arrives in a straight line and everything overshoots slightly. */
-.screen[data-p="e"]{--inD:300ms;--inE:cubic-bezier(.12,.9,.22,1);--st:22ms}
-.screen[data-p="b"]{--inD:460ms;--inE:cubic-bezier(.34,1.3,.5,1);--st:52ms}
+/* --inD / --inE / --st are owned by ENTER in the script and pushed by
+   applyTempo(). They used to ALSO be declared per theme here, which looked like
+   the authoritative table and was not: applyTempo writes them inline, and an
+   inline style beats a stylesheet rule, so Slate's designed 520ms settle had
+   been silently running at 293ms since the tempo dial was added. One owner now.
+   The values below are only the floor, for the moment before the first
+   applyTempo() and for the case where the script never gets that far - every
+   use site is written var(--inD,300ms) so it degrades without them anyway. */
+.screen{--inD:300ms;--inE:cubic-bezier(.16,1,.3,1);--st:30ms}
 @media (prefers-reduced-motion:reduce){.pad.enter .lift,.pad.enter .splitcard,.pad.enter .teambox,
  .pad.enter .vs,.pad.enter .plate,.pad.enter .vb{animation:none!important}}
 
@@ -1820,7 +1858,7 @@ var THEME={r:{a1:'#F0112E',paper:'#E7E5DC',ink:'#131219'},v:{a1:'#FF5FA8',paper:
    any of these; the profile still decides the data, the theme only the feel. */
 /* Bumped on every shipped page. Shown in Settings so 'did the update land?'
    is a thing you can read rather than guess at. */
-var WEB_BUILD='w11-url-updates';
+var WEB_BUILD='w12-media-restored';
 var THEMES={r:{name:'Screenprint',note:'Hard edges, halftone dots, misregistered ink. Fast and mechanical.'},
             v:{name:'Watercolour',note:'Pigment past the line. Soft, springy, pastel.'},
             g:{name:'Paper',note:'Flat and neutral. Barely reacts.'},
@@ -1835,9 +1873,32 @@ var tT=null;function toast(m){var t=document.getElementById('toast');if(!t)retur
 function dk(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function todayKey(){return dk(new Date());}
 function blankUser(n){return{name:n,split:'ul4',log:{},weights:{},dayOffset:0};}
-var DEFAULT={active:'r',users:{r:blankUser('Rutik'),v:blankUser('Vaishnavi'),g:blankUser('Guest')}};
+var NAMES={r:'Rutik',v:'Vaishnavi',g:'Guest'};
+var DEFAULT={active:'r',users:{r:blankUser(NAMES.r),v:blankUser(NAMES.v),g:blankUser(NAMES.g)}};
 var DB=store.get('forge.v2',null);
-if(!DB||!DB.users||!DB.users.r||!DB.users.v||!DB.users.g)DB=JSON.parse(JSON.stringify(DEFAULT));
+/* ---- shape repair, before anything touches the data ----------------------
+   The guard here used to be "do the three user records exist". A half-written
+   record passes that and is still missing log/weights/split - and the seed
+   block immediately below writes straight into them. One such record and the
+   app threw at parse time, before any render, leaving a blank screen with
+   nothing to tap and no way back short of clearing the site data.
+   It also used to throw the WHOLE database away whenever any one profile
+   looked wrong, taking two intact logs with it; each profile is repaired on
+   its own now. ensureDB() does this properly but reads tables that are not
+   defined this early, so this is the subset the boot path needs - ensureDB()
+   still runs on first access and finishes the job. */
+function repairShape(){
+ if(!DB||typeof DB!=='object')DB=JSON.parse(JSON.stringify(DEFAULT));
+ if(!DB.users||typeof DB.users!=='object')DB.users={};
+ ['r','v','g'].forEach(function(k){
+  var u=DB.users[k];
+  if(!u||typeof u!=='object')u=DB.users[k]=blankUser(NAMES[k]);
+  if(typeof u.name!=='string'||!u.name.trim())u.name=NAMES[k];
+  if(!u.log||typeof u.log!=='object')u.log={};
+  if(!u.weights||typeof u.weights!=='object')u.weights={};
+  if(typeof u.split!=='string'||!u.split)u.split='ul4';});
+ if(!DB.users[DB.active])DB.active='r';}
+repairShape();
 if(!DB.seeded){
  DB.users.r.weights={'incline-db-press':26,'neutral-pulldown':55,'landmine-press':30,'chest-supported-row':45,'cable-lateral':9,'face-pull':20,'hack-squat':90,'rdl':70,'leg-press':140,'leg-curl':40,'standing-calf':40,'cable-crunch':30,'hip-thrust':80,'goblet-squat':24,'db-row':30,'ez-curl':25,'triceps-pushdown':30};
  DB.users.v.weights={'incline-db-press':10,'neutral-pulldown':27,'landmine-press':12,'chest-supported-row':22,'cable-lateral':4,'face-pull':9,'hack-squat':35,'rdl':25,'leg-press':60,'leg-curl':20,'standing-calf':20,'cable-crunch':12,'hip-thrust':40,'goblet-squat':12,'db-row':12,'ez-curl':10,'triceps-pushdown':12};
@@ -1853,7 +1914,8 @@ if(!DB.seeded){
 /* One repair point for the whole store. localStorage can be edited, truncated or
    half-written by another tab, and a missing profile used to take the app down,
    so every read path goes through here and self-heals instead of throwing. */
-var NAMES={r:'Rutik',v:'Vaishnavi',g:'Guest'};
+/* NAMES moved up to the shape repair above - it is needed before the seed
+   block runs, and having it in two places is how they drift apart. */
 var PLATES=[25,20,15,10,5,2.5,1.25],BARS=[20,15,10];
 var ACT={
  sed:{n:'Desk-bound',f:1.35,d:'Sitting most of the day, lifting aside.'},
@@ -2345,12 +2407,36 @@ function mediaFallback(img){
   img.remove();
  }catch(e){try{img.remove();}catch(e2){}}}
 function isMedia(n){return !!(n&&n.tagName==='IMG'&&n.getAttribute&&n.getAttribute('data-mid'));}
+/* A 46px thumbnail has no business being a running animation. Six of them do:
+   six GIFs decoding and compositing every frame, each through a blend mode and
+   a contrast filter, behind a screen you are trying to read - for a picture
+   smaller than the text beside it. That was the cost nobody could point at.
+   The first frame is drawn once and the animation is dropped; the plate you
+   actually opened is the only thing still moving. */
+function freezeThumb(img){
+ try{
+  if(!img.classList.contains('tgif'))return false;
+  var w=img.naturalWidth,h=img.naturalHeight;
+  if(!w||!h)return false;
+  var c=document.createElement('canvas'),
+      sc=Math.min(1,138/Math.max(w,h));   /* renders at 46 CSS px; 3x covers any DPR */
+  c.width=Math.max(1,Math.round(w*sc));c.height=Math.max(1,Math.round(h*sc));
+  var ctx=c.getContext&&c.getContext('2d');
+  if(!ctx)return false;
+  ctx.drawImage(img,0,0,c.width,c.height);
+  c.className='tgif';c.setAttribute('aria-hidden','true');
+  if(!img.parentNode)return false;
+  img.parentNode.replaceChild(c,img);
+  requestAnimationFrame(function(){try{c.classList.add('mok');}catch(e){}});
+  return true;
+ }catch(e){return false;}}   /* no 2d context, zero-size, anything: keep the GIF */
 function mediaOK(img){
  try{
   img.classList.add('mok');
   var fig=img.closest?img.closest('.plate'):null;if(fig)fig.classList.add('ready');
   var i=parseInt(img.getAttribute('data-mbase'),10)||0;
   if(i!==_mbase){_mbase=i;try{store.set('forge.mbase',i);}catch(e){}}
+  freezeThumb(img);
  }catch(e){}}
 function mediaRetry(img){
  var id=img.getAttribute('data-mid'),
@@ -3035,8 +3121,9 @@ function renderSettings(from,fromBack){
     '<span class="swatch" aria-hidden="true"><i data-p="'+k+'"></i><i data-p="'+k+'"></i><i data-p="'+k+'"></i></span>'+
     '<span class="stx"><b>'+t.name+'</b><i>'+t.note+'</i></span>'+
     '<span class="smark">'+(on?'On':'Use')+'</span></button>';}).join('')+
-  '<p class="credit2">The look is separate from the profile \u2014 pick any of the four '+
-   'whoever you are. It changes the palette and how things move, never the numbers.</p>'+
+  '<p class="credit2">The look is separate from the profile \u2014 pick any of the '+
+   Object.keys(THEMES).length+' whoever you are. Each one has its own palette, its own '+
+   'tempo and its own way of moving between screens; none of them touches the numbers.</p>'+
   '<div class="sect">In the gym</div>'+
   '<div class="field"><label>Rest between sets</label>'+
    '<div class="segbtns">'+[['auto','Auto'],['60','60s'],['90','90s'],['120','2m'],['180','3m']]
@@ -4544,7 +4631,21 @@ var TABS=['train','plan','body','vs'];
    Curves and distances still differ - that is character - but no duration is
    ever hand-set, so nothing can drift out of step with anything else. */
 var TEMPO={r:1,v:1.06,g:1.03,c:1.22,e:0.92,b:1.14};
-var BASE={press:95,slideOut:150,slideIn:250,burst:450,enter:240,stagger:26,slide:420};
+/* How a world's content ARRIVES, once the screens have finished crossing:
+   how long one card takes, the curve it rides, and the gap between cards.
+   Ember strikes - quick to commit, long to settle. Blossom flows - nothing
+   arrives in a straight line and everything overshoots slightly. Slate takes
+   the longest and moves the least. */
+var ENTER={r:{d:240,e:'cubic-bezier(.12,.86,.25,1)',st:26},
+           v:{d:420,e:'cubic-bezier(.16,1,.3,1)',   st:48},
+           g:{d:300,e:'cubic-bezier(.16,1,.3,1)',   st:34},
+           c:{d:520,e:'cubic-bezier(.16,1,.3,1)',   st:38},
+           e:{d:300,e:'cubic-bezier(.12,.9,.22,1)', st:22},
+           b:{d:460,e:'cubic-bezier(.34,1.3,.5,1)', st:52}};
+/* enter/stagger used to live here too and were read by nothing once ENTER took
+   them over; a stale number in a table this authoritative-looking is how the
+   last one got missed. */
+var BASE={press:95,slideOut:150,slideIn:250,burst:450,slide:420};
 /* Travel was 20-26% of the screen in 150ms. Big distance at speed is what reads
    as jumpy however nice the curve is, so the distance came down and the time
    went up: a shorter move, given room to decelerate. */
@@ -4565,11 +4666,12 @@ function slideSpec(){var t=tempo(),c=CURVE[themeKey()]||CURVE.g;
  return {out:Math.round(BASE.slideOut*t),ind:Math.round(BASE.slideIn*t),oe:c.oe,ie:c.ie,dist:c.dist,
          dur:Math.round(BASE.slide*t),ease:c.ease||c.ie};}
 /* the CSS side of the same dial, pushed whenever the world changes */
-function applyTempo(){var t=tempo(),s=screenEl.style;
+function applyTempo(){var t=tempo(),s=screenEl.style,E=ENTER[themeKey()]||ENTER.g;
  s.setProperty('--pressD',Math.round(BASE.press*t)+'ms');
  s.setProperty('--fxD',   Math.round(BASE.burst*t)+'ms');
- s.setProperty('--inD',   Math.round(BASE.enter*t)+'ms');
- s.setProperty('--st',    Math.round(BASE.stagger*t)+'ms');}
+ s.setProperty('--inD',   E.d+'ms');
+ s.setProperty('--inE',   E.e);
+ s.setProperty('--st',    E.st+'ms');}
 var sliding=false,_slideGuard=null;
 /* A transition that throws part way through used to leave `sliding` latched on
    for good, and a latched flag means every tab, every Back and every swipe is
@@ -4627,7 +4729,7 @@ function ghostOut(){
 /* Each world crosses over differently. Same guarantees every time — the old
    screen is never blanked, and the new one is rendered BEFORE anything moves —
    but the mechanic itself changes, because a slide with a different duration is
-   still a slide and that is what made four themes feel like one app repainted. */
+   still a slide and that is what made six themes feel like one app repainted. */
 /* Six worlds, six mechanics. Every one still obeys the two guarantees above -
    the old screen is never blanked, and the new one is rendered BEFORE anything
    moves - but what actually happens between them is the theme's own idea:
@@ -5098,10 +5200,41 @@ document.getElementById('whoName').textContent=U().name;
 function toggleSettings(){if(view==='settings')goBack();else renderSettings();}
 document.getElementById('whoName').onclick=safe(toggleSettings,'wn');
 document.getElementById('btnGear').onclick=safe(toggleSettings,'gr');
-if(!DB.gated){openGate();}
-screenEl.setAttribute('data-p',themeKey());applyTempo();
-VOL=weeklyVolume();renderTrain();
-window.addEventListener('error',function(ev){console.error(ev.error);toast('Recovered from an error.');});
+/* ---- last line of defence ------------------------------------------------
+   Registered BEFORE the first render, not after it. As written, the handler
+   went on at the end of boot, so the one failure it could not report was a
+   failure during boot - which is the only one that leaves you looking at an
+   empty screen with nothing to tap. Rejections were not covered at all, and a
+   fault inside a render loop could raise the same toast on every frame. */
+var _errT=0;
+function reportErr(e){
+ try{console.error(e);}catch(x){}
+ var now=Date.now();if(now-_errT<4000)return;   /* one message, not a stream */
+ _errT=now;try{toast('Recovered from an error \u2014 nothing was lost.');}catch(x){}}
+window.addEventListener('error',function(ev){reportErr(ev.error||ev.message);});
+window.addEventListener('unhandledrejection',function(ev){reportErr(ev.reason);});
+/* Boot is the one place with no screen to fall back to, so it gets its own net:
+   the theme is applied even if the data is unreadable, and a render that throws
+   leaves something you can act on rather than nothing at all. */
+try{screenEl.setAttribute('data-p',themeKey());applyTempo();}catch(e){reportErr(e);}
+try{if(!DB.gated)openGate();}catch(e){reportErr(e);}
+(function boot(){
+ try{VOL=weeklyVolume();}catch(e){reportErr(e);VOL=null;}
+ try{renderTrain();return;}catch(e){reportErr(e);}
+ try{                       /* stale or half-written state is the usual cause */
+  DB=JSON.parse(JSON.stringify(DEFAULT));VOL=weeklyVolume();renderTrain();
+  toast('Your saved plan could not be read. Showing a fresh one \u2014 your log is untouched.');
+  return;
+ }catch(e){reportErr(e);}
+ try{
+  viewEl.innerHTML='<div class="sect">Something went wrong</div>'+
+   '<p style="font-size:12px;line-height:1.55;color:var(--mut);margin:0 0 12px">'+
+   'The app could not draw this screen. Your training log is stored separately and '+
+   'has not been touched. Reloading usually clears it.</p>'+
+   '<button class="lnk" id="bootReload" style="width:100%">Reload</button>';
+  document.getElementById('bootReload').onclick=function(){try{location.reload();}catch(e){}};
+ }catch(e){reportErr(e);}
+})();
 /* ---- offline ------------------------------------------------------------
    Registered late and defensively: the app works identically without it, and a
    gym basement is exactly where a failed registration must not matter. */
